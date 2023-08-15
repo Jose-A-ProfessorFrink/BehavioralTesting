@@ -3,11 +3,11 @@ namespace SimpleOrderingSystem.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class OrdersController
+public class MoviesController
 {
     //private readonly IOrderService _orderService;
 
-    public OrdersController()//IOrderService orderService)
+    public MoviesController()//IOrderService orderService)
     {
         //_orderService = orderService;
     }
@@ -15,22 +15,22 @@ public class OrdersController
     /// <summary>
     /// Testinng
     /// </summary>
-    /// <param name="orderId"></param>
+    /// <param name="movieId"></param>
     /// <returns></returns>
-    [Route("{orderId}")]
+    [Route("{movieId}")]
     [HttpGet]
-    public async Task<ActionResult<string>> GetOrder(string orderId)
+    public async Task<ActionResult<string>> GetMovie(string movieId)
     {
         //var result = await _orderService.GetOrderAsync(orderId);
 
-        if (orderId is "100")
+        if (movieId is "100")
         {
             return new NotFoundResult();
         }
 
         await Task.CompletedTask;
 
-        return $"The order you asked for was {orderId}";
+        return $"The order you asked for was {movieId}";
     }
 
 /*

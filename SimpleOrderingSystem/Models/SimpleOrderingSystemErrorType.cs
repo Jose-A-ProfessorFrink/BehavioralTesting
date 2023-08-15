@@ -2,7 +2,7 @@ namespace SimpleOrderingSystem.Models;
 
 public enum SimpleOrderingSystemErrorType
 {
-    EmployeeNotFound,
+    InvalidCustomerId,
     ProductNotFound,
     OrderRequestInvalid,
     CannotDeleteOrderUnlessItsNew,

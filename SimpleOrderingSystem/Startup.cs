@@ -1,9 +1,12 @@
 ﻿using Microsoft.OpenApi.Models;
-using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using SimpleOrderingSystem.Repositories;
+using SimpleOrderingSystem.Services;
+using SimpleOrderingSystem.Providers;
+using Microsoft.Extensions.Options;
 
 namespace SimpleOrderingSystem;
 
@@ -51,14 +54,40 @@ public class Startup
     /// Register all modules
     /// </summary>
     public void RegisterDependencies(IServiceCollection services)
-    {
-        /*
+    {     
         services
-            .RegisterDomain(_configuration)
-            .RegisterMongoProviders(_configuration)
-            .RegisterZipCodeProvider(_configuration)
-            .RegisterOrderEventsProvider(_configuration);
-            */
+            .AddTransient<ICustomersRepository, CustomersRepository>()
+            .AddTransient<IMoviesRepository, MoviesRepository>()
+            .AddTransient<IOrdersRepository, OrdersRepository>()
+            .AddTransient<IZipCodeRepository,ZipCodeRepository>();
+        
+        services
+            .AddTransient<ICustomerService,CustomerService>()
+            .AddTransient<IMovieService,MovieService>()
+            .AddTransient<IOrderService,OrderService>();
+
+        services
+            .AddTransient<IMovieProvider,MovieProvider>()
+            .AddTransient<IZipCodeProvider,ZipCodeProvider>();
+
+        // Register this provider as a singleton. It will do some initialization work
+        // that should only happen once. It is CRITICAL that this be defined as a lambda
+        // because that defers the execution of this code until the last responsible moment. 
+        // If we replace the registration for this interface in the container before we ask for
+        // the first instance, this makes sure we can get a mock without ever running this code.
+        // Making sure code doesn't run in a test context that we would otherwise
+        // find problematic is a required and fundamental part of our testing strategy.
+        services
+            .AddSingleton<ILiteDbProvider>(serviceProvider => 
+            {
+                var connectionString = _configuration.GetValue<string>("LiteDbPath");
+
+                var provider = new LiteDbProvider(connectionString);
+
+                provider.Initialize();
+
+                return provider;
+            });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
