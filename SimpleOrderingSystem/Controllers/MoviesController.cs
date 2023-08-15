@@ -1,117 +1,95 @@
 using Microsoft.AspNetCore.Mvc;
+using SimpleOrderingSystem.Services;
+using SimpleOrderingSystem.ViewModels;
+using SimpleOrderingSystem.Models;
+
 namespace SimpleOrderingSystem.Controllers;
 
 [Route("[controller]")]
 [ApiController]
 public class MoviesController
 {
-    //private readonly IOrderService _orderService;
+    private readonly IMovieService _movieService;
 
-    public MoviesController()//IOrderService orderService)
+    public MoviesController(IMovieService movieService)
     {
-        //_orderService = orderService;
+        _movieService = movieService;
     }
 
     /// <summary>
-    /// Testinng
+    /// Returns a movie by its movie id (Imdb id)
     /// </summary>
     /// <param name="movieId"></param>
     /// <returns></returns>
     [Route("{movieId}")]
     [HttpGet]
-    public async Task<ActionResult<string>> GetMovie(string movieId)
+    [ProducesResponseType(typeof(CustomerViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<MovieViewModel>> GetMovie(string movieId)
     {
-        //var result = await _orderService.GetOrderAsync(orderId);
+        var result = await _movieService.GetMovieAsync(movieId);
 
-        if (movieId is "100")
+        if (movieId is null)
         {
             return new NotFoundResult();
         }
 
-        await Task.CompletedTask;
-
-        return $"The order you asked for was {movieId}";
-    }
-
-/*
-    /// <summary>
-    /// Creates an order for a given employee
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [Route("")]
-    [HttpPost]
-    public async Task<ActionResult<OrderResponseViewmodel>> CreateOrder(CreateOrderRequestViewmodel request)
-    {
-        var result = await _orderService.CreateOrderAsync(new CreateOrderIntent
-        {
-            EmployeeName = request.EmployeeName,
-            Items = request.Items.Select(a => new CreateOrderItemIntent
-            {
-                ProductId = a.ProductCode,
-                Quantity = a.Quantity
-            })
-        });
-
-        return MapToOrderResponse(result);
+        return Map(result);
     }
 
     /// <summary>
-    /// Gets an existing order
+    /// Searches for movies based on their title. Returns a maximum of 5 results.
     /// </summary>
-    /// <param name="orderId"></param>
+    /// <param name="customerId"></param>
     /// <returns></returns>
-    [Route("{orderId}")]
+    [Route("search")]
     [HttpGet]
-    public async Task<ActionResult<OrderResponseViewmodel>> GetOrder(string orderId)
+    [ProducesResponseType(typeof(CustomerViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<MovieSearchResponseViewModel>> SearchCustomer([FromQuery] MovieSearchRequestViewModel searchRequest)
     {
-        var result = await _orderService.GetOrderAsync(orderId);
+        var movies = await _movieService.SearchMoviesAsync(searchRequest.Name!);
 
-        if (result == null)
+        return new MovieSearchResponseViewModel
         {
-            return new NotFoundResult();
-        }
-
-        return new ActionResult<OrderResponseViewmodel>(MapToOrderResponse(result));
-    }
-
-    /// <summary>
-    /// Deletes an existing order
-    /// </summary>
-    /// <param name="orderId"></param>
-    /// <returns></returns>
-    [Route("{orderId}")]
-    [HttpDelete]
-    public async Task<ActionResult> DeleteOrder(string orderId)
-    {
-        await _orderService.DeleteOrderAsync(orderId);
-
-        return new OkResult();
+            Movies = movies.Select(a=> Map(a)).ToList()
+        };
     }
 
     #region Helpers
-    private OrderResponseViewmodel MapToOrderResponse(Order order)
+
+    private MovieSearchViewModel Map(MovieSearch movie)
     {
-        return new OrderResponseViewmodel
+        return new()
         {
-            OrderId = order.Id,
-            EmployeeName = order.EmployeeName,
-            Status = order.Status,
-            TotalCost = order.TotalCost(),
-            EmployeeId = order.EmployeeId,
-            DiscountReceived = order.DiscountType,
-            Items = order.Items.Select(a => new OrderItemResponseViewmodel
-            {
-                Name = a.Name,
-                Price = a.Price,
-                Code = a.Code,
-                ProductId = a.ProductId,
-                Quantity = a.Quantity
-            }).ToList()
+            Id = movie.Id,
+            Type = movie.Type,
+            Title = movie.Title,
+            Year = movie.Year,
+            PosterUrl = movie.PosterUrl
         };
     }
-    #endregion
 
-    */
+    private MovieViewModel Map(Movie movie)
+    {
+        return new()
+        {
+            Id = movie.Id,
+            Type = movie.Type,
+            Title = movie.Title,
+            Year = movie.Year,
+            Rating = movie.Rating,
+            PlotDescription = movie.PlotDescription,
+            DateReleased = movie.DateReleased,
+            PosterUrl = movie.PosterUrl,
+            Metascore = movie.Metascore,
+            ImdbRating = movie.ImdbRating
+        };
+    }
+
+    #endregion
 }
 

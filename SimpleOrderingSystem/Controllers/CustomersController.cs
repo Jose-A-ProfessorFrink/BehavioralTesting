@@ -25,11 +25,11 @@ public class CustomersController
     /// <param name="customerId"></param>
     /// <returns></returns>
     [Route("{customerId}")]
+    [HttpGet]
     [ProducesResponseType(typeof(CustomerViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    [HttpGet]
     public async Task<ActionResult<CustomerViewModel>> GetCustomer(string customerId)
     {
         var customer = await _customerService.GetCustomerAsync(customerId);
@@ -48,10 +48,10 @@ public class CustomersController
     /// <param name="customerId"></param>
     /// <returns></returns>
     [Route("search")]
+    [HttpGet]
     [ProducesResponseType(typeof(CustomerViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    [HttpGet]
     public async Task<ActionResult<CustomerSearchResponseViewModel>> SearchCustomer([FromQuery] CustomerSearchRequestViewModel searchRequest)
     {
         var customers = await _customerService.SearchCustomersAsync(searchRequest.Name!);

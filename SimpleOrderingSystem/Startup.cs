@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using SimpleOrderingSystem.Repositories;
 using SimpleOrderingSystem.Services;
 using SimpleOrderingSystem.Providers;
-using Microsoft.Extensions.Options;
+using SimpleOrderingSystem.Extensions;
 
 namespace SimpleOrderingSystem;
 
@@ -80,13 +80,25 @@ public class Startup
         services
             .AddSingleton<ILiteDbProvider>(serviceProvider => 
             {
-                var connectionString = _configuration.GetValue<string>("LiteDbPath");
+                var connectionString = _configuration.GetValue<string>("LiteDbConnectionString");
 
                 var provider = new LiteDbProvider(connectionString);
 
                 provider.Initialize();
 
                 return provider;
+            });
+
+        services
+            .AddHttpClient(MovieProvider.HttpClientName, client =>
+            {
+                client.BaseAddress = new Uri(_configuration.GetRequiredValue("OmdbApiUrl"));
+            });
+
+        services
+            .AddHttpClient(ZipCodeProvider.HttpClientName, client =>
+            {
+                client.BaseAddress = new Uri(_configuration.GetRequiredValue("ZipwiseApiUrl"));
             });
     }
 

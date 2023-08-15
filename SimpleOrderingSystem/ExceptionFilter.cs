@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
+using SimpleOrderingSystem.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.Net;
 using SimpleOrderingSystem.Models;
 
@@ -15,6 +14,17 @@ namespace SimpleOrderingSystem;
 /// </summary>
 internal class ExceptionFilter : IExceptionFilter
 {
+    private readonly IHostEnvironment _hostEnvironment;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExceptionFilter"/> class.
+    /// </summary>
+    /// <param name="hostEnvironment"></param>
+    public ExceptionFilter(IHostEnvironment hostEnvironment)
+    {
+        _hostEnvironment = hostEnvironment;
+    }
+
     /// <summary>
     /// Handler for the exception
     /// </summary>
@@ -22,33 +32,40 @@ internal class ExceptionFilter : IExceptionFilter
     public void OnException(ExceptionContext context)
     {
         var response = context.HttpContext.Response;
+        context.Result = GetProblemDetailsActionResult(context.Exception);
+        context.ExceptionHandled = true;
+    }
 
-        //All payment exceptions can be interpreted as 400s
-        //we might want to add to this later but for now this is all we need
-        if (context.Exception is SimpleOrderingSystemException)
+
+    private IActionResult GetProblemDetailsActionResult(Exception exception)
+    {
+        var serviceException = exception as SimpleOrderingSystemException;
+        var problemDetails = new ProblemDetails();
+
+        if (serviceException != null)
         {
-            response.StatusCode = (int)HttpStatusCode.BadRequest;
-            response.ContentType = "application/json";
-            response.WriteAsync(SerializeJson(context.Exception.Message));
-
-            context.ExceptionHandled = true;
+            problemDetails.Type = serviceException.ErrorCode.ToString();
+            problemDetails.Title = serviceException.ErrorCode.GetDescription();
+            problemDetails.Status = StatusCodes.Status400BadRequest;
+            problemDetails.Detail = serviceException.Details;
         }
         else
         {
-            response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            response.ContentType = "application/json";
-            //TODO: Write error here
-            response.WriteAsync(SerializeJson("An unexpected error has occurred."));
-            context.ExceptionHandled = true;
+            problemDetails.Type = "InternalServerError";
+            problemDetails.Title = "The application has experienced an unexpected error. Please contact the site administrator.";
+            problemDetails.Status = StatusCodes.Status500InternalServerError;
         }
-    }
 
-    private string SerializeJson(object obj)
-    {
-        return JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+        if (_hostEnvironment.IsDevelopment())
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        });
+            problemDetails.Extensions.Add("stackTrace", exception.ToString());
+        }
+
+        return new ObjectResult(problemDetails)
+        {
+            StatusCode = problemDetails.Status,
+            ContentTypes = { "application/problem+json", "application/problem+xml" }
+        };
     }
 }
 

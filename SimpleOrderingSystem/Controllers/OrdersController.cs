@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using SimpleOrderingSystem.ViewModels;
+
 namespace SimpleOrderingSystem.Controllers;
+
 
 [Route("[controller]")]
 [ApiController]
@@ -19,7 +22,7 @@ public class OrdersController
     /// <returns></returns>
     [Route("{orderId}")]
     [HttpGet]
-    public async Task<ActionResult<string>> GetOrder(string orderId)
+    public async Task<ActionResult<OrderViewModel>> GetOrder(string orderId)
     {
         //var result = await _orderService.GetOrderAsync(orderId);
 
@@ -30,7 +33,7 @@ public class OrdersController
 
         await Task.CompletedTask;
 
-        return $"The order you asked for was {orderId}";
+        return null;
     }
 
 /*
