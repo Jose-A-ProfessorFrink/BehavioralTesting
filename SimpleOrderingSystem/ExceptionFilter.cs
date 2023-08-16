@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using SimpleOrderingSystem.Extensions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Net;
-using SimpleOrderingSystem.Models;
+using SimpleOrderingSystem.Domain.Models;
+using SimpleOrderingSystem.Domain.Extensions;
 
 namespace SimpleOrderingSystem;
 

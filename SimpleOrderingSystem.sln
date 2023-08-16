@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleOrderingSystem", "Sim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleOrderingSystem.Tests", "SimpleOrderingSystem.Tests\SimpleOrderingSystem.Tests.csproj", "{D7315045-DF9D-472D-BDAE-224EF49C0854}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleOrderingSystem.Domain", "SimpleOrderingSystem.Domain\SimpleOrderingSystem.Domain.csproj", "{B48E2C04-4F1D-4861-B755-2B9D271F8DF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleOrderingSystem.Repositories.Http", "SimpleOrderingSystem.Repositories.Http\SimpleOrderingSystem.Repositories.Http.csproj", "{18FBD776-55E8-450B-8A00-2532209C7BA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleOrderingSystem.Repositories.LiteDb", "SimpleOrderingSystem.Repositories.LiteDb\SimpleOrderingSystem.Repositories.LiteDb.csproj", "{9CAB95E0-B191-4838-89C0-99862147AF81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +30,17 @@ Global
 		{D7315045-DF9D-472D-BDAE-224EF49C0854}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7315045-DF9D-472D-BDAE-224EF49C0854}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7315045-DF9D-472D-BDAE-224EF49C0854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B48E2C04-4F1D-4861-B755-2B9D271F8DF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B48E2C04-4F1D-4861-B755-2B9D271F8DF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B48E2C04-4F1D-4861-B755-2B9D271F8DF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B48E2C04-4F1D-4861-B755-2B9D271F8DF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18FBD776-55E8-450B-8A00-2532209C7BA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18FBD776-55E8-450B-8A00-2532209C7BA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18FBD776-55E8-450B-8A00-2532209C7BA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18FBD776-55E8-450B-8A00-2532209C7BA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CAB95E0-B191-4838-89C0-99862147AF81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CAB95E0-B191-4838-89C0-99862147AF81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CAB95E0-B191-4838-89C0-99862147AF81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CAB95E0-B191-4838-89C0-99862147AF81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

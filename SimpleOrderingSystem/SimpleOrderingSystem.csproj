@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteDB" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.20" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -16,6 +15,12 @@
 
   <ItemGroup>
     <Folder Include="DataModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleOrderingSystem.Domain\SimpleOrderingSystem.Domain.csproj" />
+    <ProjectReference Include="..\SimpleOrderingSystem.Repositories.Http\SimpleOrderingSystem.Repositories.Http.csproj" />
+    <ProjectReference Include="..\SimpleOrderingSystem.Repositories.LiteDb\SimpleOrderingSystem.Repositories.LiteDb.csproj" />
   </ItemGroup>
 
 </Project>

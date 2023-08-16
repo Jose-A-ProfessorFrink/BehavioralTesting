@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using SimpleOrderingSystem.Services;
+using SimpleOrderingSystem.Domain;
 using SimpleOrderingSystem.ViewModels;
-using SimpleOrderingSystem.Models;
+using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.Controllers;
 
@@ -31,7 +31,7 @@ public class MoviesController
     {
         var result = await _movieService.GetMovieAsync(movieId);
 
-        if (movieId is null)
+        if (result is null)
         {
             return new NotFoundResult();
         }
@@ -61,7 +61,7 @@ public class MoviesController
 
     #region Helpers
 
-    private MovieSearchViewModel Map(MovieSearch movie)
+    private MovieSearchViewModel Map(MovieSummary movie)
     {
         return new()
         {

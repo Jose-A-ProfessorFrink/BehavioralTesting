@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using SimpleOrderingSystem.Services;
-using LiteDB;
-using SimpleOrderingSystem.Models;
+using SimpleOrderingSystem.Domain;
+using SimpleOrderingSystem.Domain.Models;
 using SimpleOrderingSystem.ViewModels;
-using System.Net;
-using Microsoft.AspNetCore.Http;
 
 namespace SimpleOrderingSystem.Controllers;
 
