@@ -47,7 +47,7 @@ internal class MoviesRepository:IMoviesRepository
 
     private string ApiKey => _configuration.GetRequiredValue("OmdbApiKey");
 
-    private MovieSummary Map(MovieSearchResultDataModel movie)
+    private MovieSummary Map(SearchMoviesResult movie)
     {
         return new()
         {
@@ -59,7 +59,7 @@ internal class MoviesRepository:IMoviesRepository
         };
     }
 
-    private Movie Map(GetMovieApiResponseDataModel movie)
+    private Movie Map(GetMovieApiResponse movie)
     {
         return new()
         {

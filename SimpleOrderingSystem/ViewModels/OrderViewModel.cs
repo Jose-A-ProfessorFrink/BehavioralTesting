@@ -4,8 +4,9 @@ public class OrderViewModel
 {
     public Guid Id { get; init;}
     public string Status { get; init;} = default!;
-    //public CustomerDataModel Customer { get; init;} = default!;
-    //public AddressDataModel Address { get; init;} = default!;
+    public string Type { get; init;} = default!;
+    public CustomerViewModel Customer { get; init;} = default!;
+    public AddressViewModel? ShippingAddress { get; init;} 
     //public List<OrderItemDataModel> Items { get; init;} = new List<OrderItemDataModel>();
     public decimal Shipping { get; init;}
     public decimal TotalCost { get; init;}

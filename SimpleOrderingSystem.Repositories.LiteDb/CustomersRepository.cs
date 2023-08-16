@@ -1,4 +1,3 @@
-using SimpleOrderingSystem.Repositories.LiteDB.Providers;
 using SimpleOrderingSystem.Repositories.LiteDB.ProviderModels;
 using SimpleOrderingSystem.Domain.Repositories;
 using SimpleOrderingSystem.Domain.Models;
@@ -23,7 +22,7 @@ internal class CustomersRepository: ICustomersRepository
             .ToList();
     }
 
-    public async Task<Customer?> GetAsync(Guid id)
+    public async Task<Customer?> GetCustomerAsync(Guid id)
     {
         var customer = await _liteDbProvider.GetCustomerAsync(id);
 

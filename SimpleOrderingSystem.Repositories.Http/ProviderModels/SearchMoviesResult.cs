@@ -1,6 +1,6 @@
 namespace SimpleOrderingSystem.Repositories.Http.ProviderModels;
 
-internal record MovieSearchResultDataModel
+internal record SearchMoviesResult
 {
     public string ImdbId { get; init;}= default!;
     public string Type { get; init;}= default!;

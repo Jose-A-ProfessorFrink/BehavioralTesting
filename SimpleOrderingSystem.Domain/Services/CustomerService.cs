@@ -27,6 +27,6 @@ internal class CustomerService: ICustomerService
             return default;
         }
 
-        return await _customersRepository.GetAsync(id);
+        return await _customersRepository.GetCustomerAsync(id);
     }
 }

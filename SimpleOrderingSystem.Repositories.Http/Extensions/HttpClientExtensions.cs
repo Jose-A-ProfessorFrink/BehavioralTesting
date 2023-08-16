@@ -15,6 +15,7 @@ public static class HttpClientExtensions
 
         await response.EnsureSuccessStatusCodeWithDetailsAsync();
 
+        //var yo = await response.Content.ReadAsStringAsync();
         var result = await response.Content.ReadFromJsonAsync<T>();
 
         if(result is null)

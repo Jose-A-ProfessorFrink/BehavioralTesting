@@ -68,93 +68,42 @@ public class OrdersController
     {
         return new()
         {
+            Id = order.Id,
+            Status = order.Status.ToString(),
+            Type = order.Type.ToString(),
+            CreatedDateTimeUtc = order.CreatedDateTimeUtc,
+            CancelledDateTimeUtc = order.CancelledDateTimeUtc,
+            CompletedDateTimeUtc = order.CompletedDateTimeUtc,
+            Shipping = order.Shipping,
+            TotalCost = order.TotalCost,
+            Customer = Map(order.Customer),
+            ShippingAddress = order.ShippingAddress is null? default: Map(order.ShippingAddress),
+        };
+    }
 
+    private CustomerViewModel Map(Customer customer)
+    {
+        return new()
+        {
+            Id = customer.Id,
+            Name = customer.Name,
+            DateHired = customer.DateHired,
+            DateOfBirth = customer.DateOfBirth,
+            AnnualSalary = customer.AnnualSalary
+        };
+    }
+
+    private AddressViewModel Map(Address address)
+    {
+        return new()
+        {
+            Line1 = address.Line1,
+            Line2 = address.Line2, 
+            City = address.City,
+            State = address.State,
+            ZipCode = address.ZipCode
         };
     }
 
     #endregion
 }
-
-
-/*
-    /// <summary>
-    /// Creates an order for a given employee
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [Route("")]
-    [HttpPost]
-    public async Task<ActionResult<OrderResponseViewmodel>> CreateOrder(CreateOrderRequestViewmodel request)
-    {
-        var result = await _orderService.CreateOrderAsync(new CreateOrderIntent
-        {
-            EmployeeName = request.EmployeeName,
-            Items = request.Items.Select(a => new CreateOrderItemIntent
-            {
-                ProductId = a.ProductCode,
-                Quantity = a.Quantity
-            })
-        });
-
-        return MapToOrderResponse(result);
-    }
-
-    /// <summary>
-    /// Gets an existing order
-    /// </summary>
-    /// <param name="orderId"></param>
-    /// <returns></returns>
-    [Route("{orderId}")]
-    [HttpGet]
-    public async Task<ActionResult<OrderResponseViewmodel>> GetOrder(string orderId)
-    {
-        var result = await _orderService.GetOrderAsync(orderId);
-
-        if (result == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return new ActionResult<OrderResponseViewmodel>(MapToOrderResponse(result));
-    }
-
-    /// <summary>
-    /// Deletes an existing order
-    /// </summary>
-    /// <param name="orderId"></param>
-    /// <returns></returns>
-    [Route("{orderId}")]
-    [HttpDelete]
-    public async Task<ActionResult> DeleteOrder(string orderId)
-    {
-        await _orderService.DeleteOrderAsync(orderId);
-
-        return new OkResult();
-    }
-
-    #region Helpers
-    private OrderResponseViewmodel MapToOrderResponse(Order order)
-    {
-        return new OrderResponseViewmodel
-        {
-            OrderId = order.Id,
-            EmployeeName = order.EmployeeName,
-            Status = order.Status,
-            TotalCost = order.TotalCost(),
-            EmployeeId = order.EmployeeId,
-            DiscountReceived = order.DiscountType,
-            Items = order.Items.Select(a => new OrderItemResponseViewmodel
-            {
-                Name = a.Name,
-                Price = a.Price,
-                Code = a.Code,
-                ProductId = a.ProductId,
-                Quantity = a.Quantity
-            }).ToList()
-        };
-    }
-    #endregion
-
-    */
-
-

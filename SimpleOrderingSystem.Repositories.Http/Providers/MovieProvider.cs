@@ -14,7 +14,7 @@ internal class MovieProvider: IMovieProvider
         _httpClientFactory = httpClientFactory;
     }
     
-    public async Task<GetMovieApiResponseDataModel> GetMovieAsync(string apiKey, string id)
+    public async Task<GetMovieApiResponse> GetMovieAsync(string apiKey, string id)
     {
         var queryString = QueryHelpers.AddQueryString("", "i", id);
         queryString = QueryHelpers.AddQueryString(queryString, "apiKey", apiKey);
@@ -27,10 +27,10 @@ internal class MovieProvider: IMovieProvider
         });
         */
 
-        return await Client.GetFromJsonWithDetailsAsync<GetMovieApiResponseDataModel>(queryString.ToString());
+        return await Client.GetFromJsonWithDetailsAsync<GetMovieApiResponse>(queryString.ToString());
     }
 
-    public async Task<SearchMoviesApiResponseDataModel> SearchMoviesAsync(string apiKey, string title)
+    public async Task<SearchMoviesApiResponse> SearchMoviesAsync(string apiKey, string title)
     {
         var queryString = QueryHelpers.AddQueryString("", "s", title);
         queryString = QueryHelpers.AddQueryString(queryString, "apiKey", apiKey);
@@ -42,7 +42,7 @@ internal class MovieProvider: IMovieProvider
         });
         */
 
-        return await Client.GetFromJsonWithDetailsAsync<SearchMoviesApiResponseDataModel>(queryString.ToString());
+        return await Client.GetFromJsonWithDetailsAsync<SearchMoviesApiResponse>(queryString.ToString());
     }
 
     #region Helpers

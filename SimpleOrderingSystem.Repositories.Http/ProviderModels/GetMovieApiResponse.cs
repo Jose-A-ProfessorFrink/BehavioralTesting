@@ -1,6 +1,6 @@
 namespace SimpleOrderingSystem.Repositories.Http.ProviderModels;
 
-internal record GetMovieApiResponseDataModel
+internal record GetMovieApiResponse
 {
     public string ImdbId { get; init;} = default!;
     public string Type { get; init;} = default!;

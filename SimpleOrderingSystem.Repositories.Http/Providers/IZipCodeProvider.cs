@@ -1,6 +1,8 @@
+using SimpleOrderingSystem.Repositories.Http.ProviderModels;
+
 namespace SimpleOrderingSystem.Repositories.Http.Providers;
 
-public interface IZipCodeProvider
+internal interface IZipCodeProvider
 {
-
+    Task<GetZipCodeApiResponse> GetZipCodeAsync(string apiKey, string code);
 }

@@ -3,5 +3,5 @@ namespace SimpleOrderingSystem.Domain.Providers;
 
 internal class DateTimeProvider:IDateTimeProvider
 {
-    public DateTime NowUtc() => DateTime.UtcNow;
+    public DateTime UtcNow() => DateTime.UtcNow;
 }

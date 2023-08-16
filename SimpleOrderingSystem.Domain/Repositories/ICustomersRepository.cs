@@ -6,5 +6,5 @@ public interface ICustomersRepository
 {
     Task<List<Customer>> SearchAsync(string name);
 
-    Task<Customer?> GetAsync(Guid id);
+    Task<Customer?> GetCustomerAsync(Guid id);
 }
