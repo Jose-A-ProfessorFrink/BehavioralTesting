@@ -5,9 +5,10 @@ namespace SimpleOrderingSystem.Repositories.LiteDB.ProviderModels;
 internal record OrderDataModel
 {
     public Guid Id { get; init;}
-    public OrderStatus Status { get; init;} = default!;
+    public OrderStatus Status { get; init;}
+    public OrderType Type { get; init;}
     public CustomerDataModel Customer { get; init;} = default!;
-    public AddressDataModel Address { get; init;} = default!;
+    public AddressDataModel? ShippingAddress { get; init;} = default!;
     public List<OrderItemDataModel> Items { get; init;} = new List<OrderItemDataModel>();
     public decimal Shipping { get; init;}
     public decimal TotalCost { get; init;}

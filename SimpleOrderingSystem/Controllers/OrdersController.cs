@@ -37,6 +37,25 @@ public class OrdersController
     }
 
     /// <summary>
+    /// Search for orders
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns></returns>
+    [Route("search")]
+    [HttpGet]
+    public async Task<ActionResult<List<OrderViewModel>>> SearchOrders([FromQuery] OrderSearchRequestViewModel request)
+    {
+        var results = await _orderService.SearchOrdersAsync(
+            new OrderSearchRequest
+            {
+                CustomerId = request.CustomerId,
+                NoOlderThan = request.NoOlderThan
+            });
+
+        return results.Select(a=> Map(a)).ToList();
+    }
+
+    /// <summary>
     /// Creates an order for a given employee
     /// </summary>
     /// <param name="request"></param>
@@ -61,6 +80,8 @@ public class OrdersController
 
         return Map(result);
     }
+
+    
 
     #region Helpers
 

@@ -73,6 +73,24 @@ internal class OrderService:IOrderService
         return default;
     }
 
+    public async Task<List<Order>> SearchOrdersAsync(OrderSearchRequest request)
+    {
+        var nowUtc = _dateTimeProvider.UtcNow();
+        DateTime? noOlderThan = request.NoOlderThan;
+
+        if(noOlderThan.HasValue)
+        {
+            if(nowUtc.Subtract(noOlderThan.Value).TotalDays> 7D)
+            {
+                noOlderThan = nowUtc.Subtract(TimeSpan.FromDays(7));
+            }
+        }
+
+        return await _ordersRepository.SearchOrdersAsync(
+            noOlderThan.GetValueOrDefault(nowUtc.Subtract(TimeSpan.FromDays(1))), 
+            request.CustomerId);   
+    }
+
     #region Helpers
 
     private async Task ValidateShippingAddressAsync(CreateOrderRequest request)

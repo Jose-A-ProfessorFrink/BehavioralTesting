@@ -60,12 +60,28 @@ internal class LiteDbProvider: ILiteDbProvider
         return Task.FromResult<OrderDataModel?>(order);
     }
 
+    public Task<List<OrderDataModel>> SearchOrdersAsync(DateTime noOlderThanUtc, Guid? customerId)
+    {
+        var orders = GetOrdersCollection();
+
+        var query = orders
+            .Query()
+            .Where(a=> a.CreatedDateTimeUtc >= noOlderThanUtc);
+        
+        if(customerId.HasValue)
+        {
+            query = query.Where(a=> a.Customer.Id == customerId);
+        }
+
+        return Task.FromResult(query.OrderByDescending(a=>a.CreatedDateTimeUtc).ToList());
+    }
+
     public void Initialize()
     {
         if(!Database.CollectionExists(OrdersCollectionName))  
         {
-            var customersCollection = Database.GetCollection<OrderDataModel>(OrdersCollectionName);
-            customersCollection.EnsureIndex(a=>a.Id);
+            var ordersCollection = Database.GetCollection<OrderDataModel>(OrdersCollectionName);
+            ordersCollection.EnsureIndex(a=>a.Id);
         }
 
         if(!Database.CollectionExists(CustomersCollectionName))
