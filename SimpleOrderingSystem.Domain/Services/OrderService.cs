@@ -169,6 +169,36 @@ internal class OrderService:IOrderService
         return order;
     }
 
+    public async Task<Order> DeleteOrderItemAsync(DeleteOrderItemRequest request)
+    {
+        Order? order;
+        if(!Guid.TryParse(request.OrderId, out var orderIdGuid) || 
+           (order = await _ordersRepository.GetOrderAsync(orderIdGuid)) is null)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.OrderIdInvalid);
+        }
+
+        if(order.Status != OrderStatus.New)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot add item to order because the order status does not allow adding items."); 
+        }
+
+        var movie = order.Items.SingleOrDefault(a=>a.MovieId == request.MovieId);
+        if(movie is null)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot remove item from order because item is not on this order.");
+        }
+        order.Items.Remove(movie);
+        
+        BigPapa.DoIt(order, default, null, false);
+
+        await _ordersRepository.UpdateOrderAsync(order);
+
+        return order;
+    }
+
     #region Helpers
 
     private async Task ValidateShippingAddressAsync(CreateOrderRequest request)

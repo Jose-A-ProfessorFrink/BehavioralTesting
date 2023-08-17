@@ -6,7 +6,6 @@ namespace Jerry2
 {
     public class Class2
     {
-        public BigPapa Handle = default!;
         private const string Toplevel = "20";
         private static List<Tuple<int,decimal>> Magic1 = new List<Tuple<int, decimal>>
         {

@@ -14,7 +14,6 @@ namespace Jerry
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 
             calculator = (Class2)assembly.CreateInstance("Jerry2.Class2")!;
-            calculator.Handle = new BigPapa();
         }
 
         public static void DoIt(Order order, Movie? movie, string? q, bool normalize)
@@ -41,7 +40,7 @@ namespace Jerry
                 {
                     items.Add(new OrderItem() { MovieId = movie!.Id, Quantity = Convert.ToInt32(q), MovieYear = movie.Year, MovieMetascore = movie.Metascore});
                 }
-                
+
                 calculator.CheckIt(order, items.ToArray(), null);
             }
             catch
