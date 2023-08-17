@@ -1,6 +1,6 @@
 namespace SimpleOrderingSystem.ViewModels;
 
-public class CustomerViewModel
+public record CustomerViewModel
 {
     public Guid Id { get; init;}
     public string Name { get; init;} = default!;

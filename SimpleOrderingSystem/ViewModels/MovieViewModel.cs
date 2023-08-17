@@ -1,6 +1,6 @@
 namespace SimpleOrderingSystem.ViewModels;
 
-public class MovieViewModel
+public record MovieViewModel
 {
     public string Id { get; set;} = default!;
     public string Type { get; init;} = default!;

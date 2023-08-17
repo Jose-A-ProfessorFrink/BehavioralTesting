@@ -3,7 +3,7 @@ using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.ViewModels;
 
-public class CreateOrderRequestViewModel
+public record CreateOrderRequestViewModel
 {
     [Required]
     public string? CustomerId { get; init;}

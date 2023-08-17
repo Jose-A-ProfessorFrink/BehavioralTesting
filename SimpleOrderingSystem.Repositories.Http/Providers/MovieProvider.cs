@@ -19,14 +19,6 @@ internal class MovieProvider: IMovieProvider
         var queryString = QueryHelpers.AddQueryString("", "i", id);
         queryString = QueryHelpers.AddQueryString(queryString, "apiKey", apiKey);
 
-/*
-        var queryString = QueryString.Create(new[]
-        {
-            new KeyValuePair<string, string?>("i", id),
-            new KeyValuePair<string, string?>("apiKey", apiKey)
-        });
-        */
-
         return await Client.GetFromJsonWithDetailsAsync<GetMovieApiResponse>(queryString.ToString());
     }
 
@@ -34,13 +26,6 @@ internal class MovieProvider: IMovieProvider
     {
         var queryString = QueryHelpers.AddQueryString("", "s", title);
         queryString = QueryHelpers.AddQueryString(queryString, "apiKey", apiKey);
-        /*
-        var queryString = QueryString.Create(new[]
-        {
-            new KeyValuePair<string, string?>("s", title),
-            new KeyValuePair<string, string?>("apiKey", apiKey)
-        });
-        */
 
         return await Client.GetFromJsonWithDetailsAsync<SearchMoviesApiResponse>(queryString.ToString());
     }

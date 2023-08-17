@@ -12,7 +12,7 @@ internal record OrderDataModel
     public List<OrderItemDataModel> Items { get; init;} = new List<OrderItemDataModel>();
     public decimal Shipping { get; init;}
     public decimal TotalCost { get; init;}
-    public List<OrderDiscount> AppliedDiscounts {get; init;} = new List<OrderDiscount>();
+    public List<OrderDiscountDataModel> Discounts {get; init;} = new List<OrderDiscountDataModel>();
     public DateTime CreatedDateTimeUtc { get; init;}
     public DateTime? CancelledDateTimeUtc {get; init;}
     public DateTime? CompletedDateTimeUtc {get; init;}

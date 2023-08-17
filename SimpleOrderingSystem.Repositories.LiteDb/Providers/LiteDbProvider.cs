@@ -48,6 +48,13 @@ internal class LiteDbProvider: ILiteDbProvider
         return Task.CompletedTask;
     }
 
+    public Task<bool> UpdateOrderAsync(OrderDataModel order)
+    {
+        var orders = GetOrdersCollection();
+
+        return Task.FromResult(orders.Update(order));
+    }
+
     public Task<OrderDataModel?> GetOrderAsync(Guid id)
     {
         var orders = GetOrdersCollection();

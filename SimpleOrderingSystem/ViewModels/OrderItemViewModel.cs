@@ -1,6 +1,8 @@
-namespace SimpleOrderingSystem.Domain.Models;
 
-public class OrderItem
+
+namespace SimpleOrderingSystem.ViewModels;
+
+public class OrderItemViewModel
 {
     public string MovieId { get; set; } = default!;
     public string? MovieYear {get; set; }

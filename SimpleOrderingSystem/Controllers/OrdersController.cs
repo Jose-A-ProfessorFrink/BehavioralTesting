@@ -8,7 +8,7 @@ namespace SimpleOrderingSystem.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class OrdersController
+public class OrdersController: ControllerBase
 {
     private readonly IOrderService _orderService;
 
@@ -78,10 +78,54 @@ public class OrdersController
             }
         });
 
-        return Map(result);
+        return CreatedAtAction(
+            nameof(GetOrder), 
+            new { OrderId = result.Id.ToString()}, 
+            Map(result));
     }
 
-    
+    /// <summary>
+    /// Adds items to an existing order. Order must be in a New status.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns></returns>
+    [Route("{orderId}/items")]
+    [HttpPost]
+    public async Task<ActionResult<OrderViewModel>> AddOrderItem(string orderId, AddOrderItemRequestViewModel request)
+    {
+        return Map(await _orderService.AddOrderItemAsync(new()
+        {
+            OrderId = orderId,
+            MovieId = request.MovieId,
+            Quantity = request.Quantity.GetValueOrDefault(1)
+        }));
+    }
+
+    /// <summary>
+    /// Cancel an existing order. Order must be in a New status.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns></returns>
+    [Route("{orderId}")]
+    [HttpDelete]
+    public async Task<ActionResult<OrderViewModel>> CancelOrder(string orderId)
+    {
+        return Map(await _orderService.CancelOrderAsync(orderId));
+    }
+
+    /// <summary>
+    /// Complete an existing order. Order must be in a New status.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns></returns>
+    [Route("{orderId}/complete")]
+    [HttpPost]
+    public async Task<ActionResult<OrderViewModel>> CompleteOrder(string orderId)
+    {
+        return Map(await _orderService.CompleteOrderAsync(orderId));
+    }
+
+
 
     #region Helpers
 
@@ -99,6 +143,8 @@ public class OrdersController
             TotalCost = order.TotalCost,
             Customer = Map(order.Customer),
             ShippingAddress = order.ShippingAddress is null? default: Map(order.ShippingAddress),
+            Items = order.Items.Select(a => Map(a)).ToList(),
+            Discounts = order.Discounts.Select(a => Map(a)).ToList(),
         };
     }
 
@@ -126,5 +172,25 @@ public class OrdersController
         };
     }
 
+    private OrderDiscountViewModel Map(OrderDiscount orderDiscount)
+    {
+        return new()
+        {
+            Type = orderDiscount.Type,
+            PercentDiscount = orderDiscount.PercentDiscount
+        };
+    }
+
+    private OrderItemViewModel Map(OrderItem orderItem)
+    {
+        return new()
+        {
+            MovieId = orderItem.MovieId,
+            MovieYear = orderItem.MovieYear,
+            MovieMetascore = orderItem.MovieMetascore,
+            Price = orderItem.Price,
+            Quantity = orderItem.Quantity
+        };
+    }
     #endregion
 }

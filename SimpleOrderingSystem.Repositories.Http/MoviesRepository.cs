@@ -23,9 +23,9 @@ internal class MoviesRepository:IMoviesRepository
     {
         var apiResponse = await _movieProvider.GetMovieAsync(ApiKey, id);
 
-        if(apiResponse.Response == InvalidResponseCode && apiResponse.Error == "Incorrect IMDb ID.")
+        if(apiResponse.Response == InvalidResponseCode)
         {
-            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.MovieIdInvalid);
+            return default;
         }
 
         return Map(apiResponse);

@@ -1,8 +1,8 @@
 using SimpleOrderingSystem.Domain.Models;
 
-namespace SimpleOrderingSystem.Repositories.LiteDB.ProviderModels;
+namespace SimpleOrderingSystem.ViewModels;
 
-internal record OrderDiscountDataModel
+public class OrderDiscountViewModel
 {
     public DiscountType Type { get; set; }
     public decimal PercentDiscount {get;set;}

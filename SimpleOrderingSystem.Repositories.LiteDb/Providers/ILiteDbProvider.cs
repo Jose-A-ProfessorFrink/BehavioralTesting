@@ -11,6 +11,8 @@ internal interface ILiteDbProvider
 
     Task CreateOrderAsync(OrderDataModel order);
 
+    Task<bool> UpdateOrderAsync(OrderDataModel order);
+
     Task<OrderDataModel?> GetOrderAsync(Guid orderId);
 
     Task<List<OrderDataModel>> SearchOrdersAsync(DateTime noOlderThanUtc, Guid? customerId);

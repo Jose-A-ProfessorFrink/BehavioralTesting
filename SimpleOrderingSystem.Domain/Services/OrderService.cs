@@ -1,3 +1,4 @@
+using Jerry;
 using SimpleOrderingSystem.Domain.Models;
 using SimpleOrderingSystem.Domain.Providers;
 using SimpleOrderingSystem.Domain.Repositories;
@@ -10,6 +11,7 @@ internal class OrderService:IOrderService
     private readonly IOrdersRepository _ordersRepository;
     private readonly ICustomersRepository _customersRepository;
     private readonly IZipCodeRepository _zipCodeRepository;
+    private readonly IMoviesRepository _moviesRepository;
     private readonly IGuidProvider _guidProvider;
     private readonly IDateTimeProvider _dateTimeProvider;
 
@@ -17,12 +19,14 @@ internal class OrderService:IOrderService
         IOrdersRepository ordersRepository, 
         ICustomersRepository customersRepository,
         IZipCodeRepository zipCodeRepository,
+        IMoviesRepository moviesRepository,
         IGuidProvider guidProvider, 
         IDateTimeProvider dateTimeProvider)
     {
         _ordersRepository = ordersRepository;
         _customersRepository = customersRepository;
         _zipCodeRepository = zipCodeRepository;
+        _moviesRepository = moviesRepository;
         _guidProvider = guidProvider;
         _dateTimeProvider = dateTimeProvider;
     }
@@ -89,6 +93,80 @@ internal class OrderService:IOrderService
         return await _ordersRepository.SearchOrdersAsync(
             noOlderThan.GetValueOrDefault(nowUtc.Subtract(TimeSpan.FromDays(1))), 
             request.CustomerId);   
+    }
+
+    public async Task<Order> CancelOrderAsync(string orderId)
+    {
+        Order? order;
+        if(!Guid.TryParse(orderId, out var orderIdGuid) || 
+           (order = await _ordersRepository.GetOrderAsync(orderIdGuid)) is null)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.OrderIdInvalid);
+        }
+
+        if(order.Status != OrderStatus.New)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot cancel order because the order status does not allow cancellation."); 
+        }
+
+        order.Status = OrderStatus.Cancelled;
+        order.CancelledDateTimeUtc = _dateTimeProvider.UtcNow();
+
+        await _ordersRepository.UpdateOrderAsync(order);
+
+        return order;
+    }
+
+    public async Task<Order> CompleteOrderAsync(string orderId)
+    {
+        Order? order;
+        if(!Guid.TryParse(orderId, out var orderIdGuid) || 
+           (order = await _ordersRepository.GetOrderAsync(orderIdGuid)) is null)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.OrderIdInvalid);
+        }
+
+        if(order.Status != OrderStatus.New)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot complete order because the order status does not allow completion."); 
+        }
+
+        order.Status = OrderStatus.Completed;
+        order.CompletedDateTimeUtc = _dateTimeProvider.UtcNow();
+
+        await _ordersRepository.UpdateOrderAsync(order);
+
+        return order;
+    }
+
+    public async Task<Order> AddOrderItemAsync(AddOrderItemRequest request)
+    {
+        Order? order;
+        if(!Guid.TryParse(request.OrderId, out var orderIdGuid) || 
+           (order = await _ordersRepository.GetOrderAsync(orderIdGuid)) is null)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.OrderIdInvalid);
+        }
+
+        if(order.Status != OrderStatus.New)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot add item to order because the order status does not allow adding items."); 
+        }
+
+        var movie = await _moviesRepository.GetMovieAsync(request.MovieId);
+        if(movie is null)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.MovieIdInvalid);
+        }
+
+        BigPapa.DoIt(order, movie, request.Quantity.ToString(), false);
+
+        await _ordersRepository.UpdateOrderAsync(order);
+
+        return order;
     }
 
     #region Helpers

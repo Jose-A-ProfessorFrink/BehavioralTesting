@@ -9,9 +9,9 @@ public class Order
     public Address? ShippingAddress { get; init;} = default!;
     public List<OrderItem> Items { get; init;} = new List<OrderItem>();
     public List<OrderDiscount> Discounts {get; init;} = new List<OrderDiscount>();
-    public decimal Shipping { get; init;}
-    public decimal TotalCost { get; init;}
+    public decimal Shipping { get; set;}
+    public decimal TotalCost { get; set;}
     public DateTime CreatedDateTimeUtc { get; init;}
-    public DateTime? CancelledDateTimeUtc {get; init;}
-    public DateTime? CompletedDateTimeUtc {get; init;}
+    public DateTime? CancelledDateTimeUtc {get; set;}
+    public DateTime? CompletedDateTimeUtc {get; set;}
 }

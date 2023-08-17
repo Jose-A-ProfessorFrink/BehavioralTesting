@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SimpleOrderingSystem.ViewModels;
 
-public class CustomerSearchRequestViewModel
+public record CustomerSearchRequestViewModel
 {
     [Required]
     [MinLength(2, ErrorMessage = "The name search must be at least 2 characters long.")]

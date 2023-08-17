@@ -17,8 +17,16 @@ internal class OrdersRepository: IOrdersRepository
     public async Task CreateOrderAsync(Order order)
     {
         await _liteDbProvider.CreateOrderAsync(Map(order));
+    }
 
-        return;
+    public async Task UpdateOrderAsync(Order order)
+    {
+        var succeeded = await _liteDbProvider.UpdateOrderAsync(Map(order));
+
+        if(!succeeded)
+        {
+            throw new Exception("An unexpected error has occurred. Unable to update order by id because order does not exist");
+        }
     }
 
     public async Task<Order?> GetOrderAsync(Guid id)
@@ -50,6 +58,8 @@ internal class OrdersRepository: IOrdersRepository
             TotalCost = order.TotalCost,
             Customer = Map(order.Customer),
             ShippingAddress = order.ShippingAddress is null? default: Map(order.ShippingAddress),
+            Discounts = order.Discounts.Select(a=> Map(a)).ToList(),
+            Items = order.Items.Select(a=> Map(a)).ToList()
         };
     }
 
@@ -67,6 +77,8 @@ internal class OrdersRepository: IOrdersRepository
             TotalCost = order.TotalCost,
             Customer = Map(order.Customer),
             ShippingAddress = order.ShippingAddress is null? default: Map(order.ShippingAddress),
+            Discounts = order.Discounts.Select(a=> Map(a)).ToList(),
+            Items = order.Items.Select(a=> Map(a)).ToList()
         };
     }
 
@@ -115,6 +127,48 @@ internal class OrdersRepository: IOrdersRepository
             City = address.City,
             State = address.State,
             ZipCode = address.ZipCode
+        };
+    }
+
+    private OrderDiscountDataModel Map(OrderDiscount orderDiscount)
+    {
+        return new()
+        {
+            Type = orderDiscount.Type,
+            PercentDiscount = orderDiscount.PercentDiscount
+        };
+    }
+
+    private OrderDiscount Map(OrderDiscountDataModel orderDiscount)
+    {
+        return new()
+        {
+            Type = orderDiscount.Type,
+            PercentDiscount = orderDiscount.PercentDiscount
+        };
+    }
+
+    private OrderItemDataModel Map(OrderItem orderItem)
+    {
+        return new()
+        {
+            MovieId = orderItem.MovieId,
+            MovieYear = orderItem.MovieYear,
+            MovieMetascore = orderItem.MovieMetascore,
+            Price = orderItem.Price,
+            Quantity = orderItem.Quantity
+        };
+    }
+
+    private OrderItem Map(OrderItemDataModel orderItem)
+    {
+        return new()
+        {
+            MovieId = orderItem.MovieId,
+            MovieYear = orderItem.MovieYear,
+            MovieMetascore = orderItem.MovieMetascore,
+            Price = orderItem.Price,
+            Quantity = orderItem.Quantity
         };
     }
 

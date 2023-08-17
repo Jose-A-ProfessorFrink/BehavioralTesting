@@ -1,6 +1,6 @@
 namespace SimpleOrderingSystem.ViewModels;
 
-public class MovieSearchResponseViewModel
+public record MovieSearchResponseViewModel
 {
     public List<MovieSearchViewModel> Movies { get; set; } = new List<MovieSearchViewModel>();
 }

@@ -16,5 +16,7 @@ public enum SimpleOrderingSystemErrorType
     ShippingAddressInvalid,
     [Description("The supplied customer id is invalid")]
     CustomerIdInvalid,
+    [Description("The supplied order id is invalid")]
+    OrderIdInvalid
 
 }

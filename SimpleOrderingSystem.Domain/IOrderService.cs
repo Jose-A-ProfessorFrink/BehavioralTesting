@@ -9,4 +9,10 @@ public interface IOrderService
     Task<Order?> GetOrderAsync(string orderId);
 
     Task<List<Order>> SearchOrdersAsync(OrderSearchRequest request);
+
+    Task<Order> CancelOrderAsync(string orderId);
+
+    Task<Order> CompleteOrderAsync(string orderId);
+
+    Task<Order> AddOrderItemAsync(AddOrderItemRequest request);
 }
