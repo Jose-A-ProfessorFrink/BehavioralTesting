@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Configuration;
-using Mindbody.Sales.Tests.Common.Application;
 using SimpleOrderingSystem.Repositories.Http.Providers;
 using SimpleOrderingSystem.Repositories.Http.ProviderModels;
 

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem;
 
-namespace Mindbody.Sales.Tests.Common.Application;
+namespace SimpleOrderingSystem.Tests.Common;
 
 /// <summary>
 /// The web application factory for this solution.

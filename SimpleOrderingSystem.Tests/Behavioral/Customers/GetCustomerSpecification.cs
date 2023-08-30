@@ -1,6 +1,5 @@
 
 using Microsoft.Extensions.Configuration;
-using Mindbody.Sales.Tests.Common.Application;
 using SimpleOrderingSystem.Repositories.LiteDB.ProviderModels;
 using SimpleOrderingSystem.Repositories.LiteDB.Providers;
 
