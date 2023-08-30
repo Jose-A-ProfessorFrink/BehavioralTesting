@@ -86,7 +86,6 @@ Exit:
 
         public void PriceItem(OrderItem item)
         {
-
             try
             { 
                   var a = Int32.Parse(item.MovieYear!);

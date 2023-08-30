@@ -27,7 +27,7 @@ public static class Program
                 webHostBuilder.UseStartup<Startup>();
             })
             .ConfigureLogging((context, builder) =>
-                {
+            {
                     builder.ClearProviders();
                     builder.AddConfiguration(context.Configuration.GetSection("Logging"));
                     builder.AddDebug();

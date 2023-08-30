@@ -49,7 +49,7 @@ public class MoviesController
     [ProducesResponseType(typeof(CustomerViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<MovieSearchResponseViewModel>> SearchCustomer([FromQuery] MovieSearchRequestViewModel searchRequest)
+    public async Task<ActionResult<MovieSearchResponseViewModel>> SearchMovies([FromQuery] MovieSearchRequestViewModel searchRequest)
     {
         var movies = await _movieService.SearchMoviesAsync(searchRequest.Name!);
 

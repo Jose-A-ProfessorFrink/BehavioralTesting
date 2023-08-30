@@ -49,7 +49,7 @@ public class CustomersController
     [ProducesResponseType(typeof(CustomerViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<CustomerSearchResponseViewModel>> SearchCustomer([FromQuery] CustomerSearchRequestViewModel searchRequest)
+    public async Task<ActionResult<CustomerSearchResponseViewModel>> SearchCustomers([FromQuery] CustomerSearchRequestViewModel searchRequest)
     {
         var customers = await _customerService.SearchCustomersAsync(searchRequest.Name!);
 

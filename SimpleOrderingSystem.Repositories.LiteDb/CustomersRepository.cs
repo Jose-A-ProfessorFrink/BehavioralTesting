@@ -22,7 +22,7 @@ internal class CustomersRepository: ICustomersRepository
             .ToList();
     }
 
-    public async Task<Customer?> GetCustomerAsync(Guid id)
+    public async Task<Customer?> GetAsync(Guid id)
     {
         var customer = await _liteDbProvider.GetCustomerAsync(id);
 

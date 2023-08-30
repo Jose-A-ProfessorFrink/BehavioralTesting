@@ -35,7 +35,7 @@ internal class OrderService:IOrderService
     {
         Customer? customer = default;
         if(!Guid.TryParse(request.CustomerId, out var customerId) || 
-            ((customer = await _customersRepository.GetCustomerAsync(customerId)) is null))
+            ((customer = await _customersRepository.GetAsync(customerId)) is null))
         {
             throw new SimpleOrderingSystemException(
                 SimpleOrderingSystemErrorType.CustomerIdInvalid);
@@ -131,6 +131,12 @@ internal class OrderService:IOrderService
         {
             throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
                 $"Cannot complete order because the order status does not allow completion."); 
+        }
+
+        if(!order.Items.Any())
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot complete order because the order does not contain any items!"); 
         }
 
         order.Status = OrderStatus.Completed;
