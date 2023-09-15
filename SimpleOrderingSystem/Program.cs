@@ -37,7 +37,7 @@ public static class Program
             {
                 configurationBuilder.AddJsonFile("appsettings.json", false, false);
 
-                //contains your specific keys.
-                configurationBuilder.AddJsonFile($@"c:\temp\appsettings.json", false, false);
+                //contains your specific keys. file is optional
+                configurationBuilder.AddJsonFile($@"c:\temp\appsettings.json", true, false);
             });
 }

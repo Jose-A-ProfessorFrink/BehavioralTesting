@@ -15,7 +15,18 @@ public class GetMovieSpecification : IDisposable
     // default return objects bound to mocks
     private GetMovieApiResponse _getMovieApiResponse = new()
     {
-        
+        ImdbId= "tt1856101",
+        Title= "Blade Runner 2049",
+        Year= "2017",
+        Rated= "R",
+        Released= "06 Oct 2017",
+        Plot= "a plot",
+        Poster= "https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg",
+        Metascore= "81",
+        ImdbRating= "8.0",
+        Type= "movie",
+        Response= "True",
+        Error = default
     };
 
     // custom application settings
@@ -53,16 +64,25 @@ public class GetMovieSpecification : IDisposable
     public async Task Test3()
     {
         // when I get a customer
-        var response = await GetMovieAsync(Defaults.CustomerId.ToString());
+        var response = await GetMovieAsync(Defaults.MovieId);
 
         // then I expect the following 
         await response.ShouldBeOkWithResponseAsync(new TestMovieViewModel
         {
-            
+            Id= "tt1856101",
+            Title= "Blade Runner 2049",
+            Year= "2017",
+            Rating= "R",
+            DateReleased= "06 Oct 2017",
+            PlotDescription= "a plot",
+            PosterUrl= "https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg",
+            Metascore= "81",
+            ImdbRating= "8.0",
+            Type= "movie",      
         });
 
         // then I expect the provider to have been called with the following
-        //_movieProviderMock.Verify(a=>a.GetMovieAsync( Defaults.MovieServiceApiKey, Defaults.MovieId), Times.Once());
+        _movieProviderMock.Verify(a=>a.GetMovieAsync( Defaults.MovieServiceApiKey, Defaults.MovieId), Times.Once());
     }
 
     #region Helpers

@@ -35,9 +35,14 @@ internal class MoviesRepository:IMoviesRepository
     {
         var apiResponse = await _movieProvider.SearchMoviesAsync(ApiKey, title);
 
-        if(apiResponse.Response == InvalidResponseCode && apiResponse.Error == "Too many results.")
+        if(apiResponse.Response == InvalidResponseCode)
         {
-            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.SearchMovieRequestTooBroad);
+            if(apiResponse.Error == "Too many results.")
+            {
+                throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.SearchMovieRequestTooBroad);
+            }
+
+            return new List<MovieSummary>();
         }
 
         return apiResponse.Search.Select(a=>Map(a)).ToList();
