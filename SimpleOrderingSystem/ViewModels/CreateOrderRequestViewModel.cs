@@ -9,8 +9,7 @@ public record CreateOrderRequestViewModel
     public string? CustomerId { get; init;}
 
     [Required]
-    public OrderType Type { get; init; }
+    public OrderType? Type { get; init; }
 
-    [Required]
     public AddressViewModel? ShippingAddress {get; init;}
 }

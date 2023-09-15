@@ -67,7 +67,7 @@ public class OrdersController: ControllerBase
         var result = await _orderService.CreateOrderAsync(new CreateOrderRequest
         {
             CustomerId = request.CustomerId!,
-            Type = request.Type,
+            Type = request.Type!.Value,
             ShippingAddress = request.ShippingAddress is null? null: new()
             {
                 Line1 = request.ShippingAddress.Line1,

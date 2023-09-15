@@ -33,7 +33,7 @@ internal class OrderService:IOrderService
 
     public async Task<Order> CreateOrderAsync(CreateOrderRequest request)
     {
-        Customer? customer = default;
+        Customer? customer;
         if(!Guid.TryParse(request.CustomerId, out var customerId) || 
             ((customer = await _customersRepository.GetAsync(customerId)) is null))
         {
@@ -230,7 +230,7 @@ internal class OrderService:IOrderService
             {
                 throw new SimpleOrderingSystemException(
                     SimpleOrderingSystemErrorType.ShippingAddressInvalid,        
-                    "The state code provided is invalid or does not correspond to the supplied zip code.");                
+                    "The state code provided does not correspond to the supplied zip code.");                
             }
 
             if(!zipCodeInfo.Cities.Any(a=> a.Equals(request.ShippingAddress.City, StringComparison.InvariantCultureIgnoreCase)))

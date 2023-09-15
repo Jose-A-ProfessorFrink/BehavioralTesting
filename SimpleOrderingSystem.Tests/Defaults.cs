@@ -18,4 +18,5 @@ public static class Defaults
     public static readonly DateOnly CustomerDateOfBirth = new DateOnly(1975, 10, 15);
     public static readonly DateOnly CustomerDateHired = new DateOnly(1999, 1, 15);
     public static readonly decimal CustomerAnnualSalary = 64540;
+    public static readonly string ZipCode = "90210";
 }
