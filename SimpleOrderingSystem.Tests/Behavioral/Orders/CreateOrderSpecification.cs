@@ -129,7 +129,7 @@ public class CreateOrderSpecification : IDisposable
         _request.ShippingAddress = new TestAddressViewModel();
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingModelStateValidationBadRequestAsync(
@@ -149,7 +149,7 @@ public class CreateOrderSpecification : IDisposable
         _request.ShippingAddress!.State = "Alabama";
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingModelStateValidationBadRequestAsync(
@@ -167,7 +167,7 @@ public class CreateOrderSpecification : IDisposable
         _request.ShippingAddress!.ZipCode = zipCode;
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingModelStateValidationBadRequestAsync(
@@ -183,7 +183,7 @@ public class CreateOrderSpecification : IDisposable
         _request.CustomerId = "not a guid";
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
@@ -198,7 +198,7 @@ public class CreateOrderSpecification : IDisposable
         _customerDataModel = default;
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
@@ -213,7 +213,7 @@ public class CreateOrderSpecification : IDisposable
         _getZipCodeApiResponse.Results.Error = "is not a valid ZIP code.";
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
@@ -229,7 +229,7 @@ public class CreateOrderSpecification : IDisposable
         _getZipCodeApiResponse = _getZipCodeApiResponse with { Results = _getZipCodeApiResponse.Results with { State = "AL"}};
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
@@ -251,7 +251,7 @@ public class CreateOrderSpecification : IDisposable
         };
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
@@ -264,7 +264,7 @@ public class CreateOrderSpecification : IDisposable
     public async Task Test9()
     {
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // then I expect the response to be created and contain the following
         await response.ShouldBeCreatedWithResponseAsync(new TestOrderViewModel
@@ -333,7 +333,7 @@ public class CreateOrderSpecification : IDisposable
         _getZipCodeApiResponse.Results.Error = "unhandled exception";
 
         // when I create an order
-        var response = await CreateOrdersAsync(_request);
+        var response = await CreateOrderAsync(_request);
 
         // the I expect the response to be the following error
         response.ShouldBeInternalServerError();
@@ -345,7 +345,7 @@ public class CreateOrderSpecification : IDisposable
 
     #region Helpers
 
-    public async Task<HttpResponseMessage> CreateOrdersAsync(TestCreateOrderRequestViewModel request)
+    public async Task<HttpResponseMessage> CreateOrderAsync(TestCreateOrderRequestViewModel request)
     {
         return await _webApplicationFactory.CreateClient().PostAsJsonAsync($"Orders", request);
     }

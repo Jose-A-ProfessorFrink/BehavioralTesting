@@ -40,7 +40,7 @@ public class GetMovieSpecification : IDisposable
         // given I have a web application factory
         _webApplicationFactory = WebApplicationFactory.Create((a) => a.AddInMemoryCollection(_appSettings));
 
-        // given I mock out the lite db provider and setup appropriate defaults
+        // given I mock out the movie provider and setup appropriate defaults
         _movieProviderMock = _webApplicationFactory.Mock<IMovieProvider>();
         _movieProviderMock
             .Setup(a=>a.GetMovieAsync(It.IsAny<string>(), It.IsAny<string>()))
