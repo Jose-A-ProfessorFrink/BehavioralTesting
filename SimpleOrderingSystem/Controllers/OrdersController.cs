@@ -43,7 +43,7 @@ public class OrdersController: ControllerBase
     /// <returns></returns>
     [Route("search")]
     [HttpGet]
-    public async Task<ActionResult<List<OrderViewModel>>> SearchOrders([FromQuery] OrderSearchRequestViewModel request)
+    public async Task<ActionResult<OrderSearchResponseViewModel>> SearchOrders([FromQuery] OrderSearchRequestViewModel request)
     {
         var results = await _orderService.SearchOrdersAsync(
             new OrderSearchRequest
@@ -52,7 +52,7 @@ public class OrdersController: ControllerBase
                 NoOlderThan = request.NoOlderThan
             });
 
-        return results.Select(a=> Map(a)).ToList();
+        return new OrderSearchResponseViewModel { Orders = results.Select(a=> Map(a)).ToList() };
     }
 
     /// <summary>

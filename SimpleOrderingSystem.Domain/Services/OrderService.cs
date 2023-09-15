@@ -82,7 +82,7 @@ internal class OrderService:IOrderService
         var nowUtc = _dateTimeProvider.UtcNow();
         DateTime? noOlderThan = request.NoOlderThan;
 
-        if(noOlderThan.HasValue)
+        if(!request.CustomerId.HasValue && noOlderThan.HasValue)
         {
             if(nowUtc.Subtract(noOlderThan.Value).TotalDays> 7D)
             {
