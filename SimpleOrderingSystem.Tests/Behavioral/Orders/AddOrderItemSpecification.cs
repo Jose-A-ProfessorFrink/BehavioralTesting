@@ -163,6 +163,95 @@ public class AddOrderItemSpecification : IDisposable
             "Invalid movie id was supplied. Please provide a valid imdb movie id (i.e. like 'tt3896198'). See https://developer.imdb.com/documentation/key-concepts#imdb-ids for more information.");
     }
 
+    [Fact(DisplayName = "Add order item should store new order in the database correctly and return the correct order data")]
+    public async Task Test9()
+    {
+        // when I add an order item
+        var response = await AddOrderItemAsync(_orderId, _request);
+
+        // then I expect the response to be created and contain the following
+        await response.ShouldBeOkWithResponseAsync(new TestOrderViewModel
+        {
+            Id = Defaults.OrderId,
+            Status = "New",
+            Type = "Shipped",
+            CreatedDateTimeUtc = Defaults.DateCreated,
+            CancelledDateTimeUtc = default,
+            CompletedDateTimeUtc = default,
+            Shipping = 5M,
+            TotalCost = 21.2M,
+            Customer = new()
+            {
+                Id = Defaults.CustomerId,
+                Name = Defaults.CustomerName,
+                DateOfBirth = Defaults.CustomerDateOfBirth,
+                DateHired = Defaults.CustomerDateHired,
+                AnnualSalary = Defaults.CustomerAnnualSalary
+            },
+            ShippingAddress = new()
+            {
+                Line1  = "1121 Ash Lane",
+                Line2 = "Southwest",
+                City  = "Beverly Hills",
+                State  = "CA",
+                ZipCode  = "90210"
+            },
+            Items = new()
+            {
+                new()
+                {
+                    MovieId = "tt1856101",
+                    MovieYear = "2017",
+                    MovieMetascore = "81",
+                    Quantity = 1,
+                    Price = 16.2M
+                }
+            }  
+        });
+    
+        // then I expect the database to have been called with the following
+        _liteDbProviderMock
+            .Verify(a=> a.UpdateOrderAsync(ItShould.Be(new OrderDataModel()
+            {
+                Id = Defaults.OrderId,
+                Status = Domain.Models.OrderStatus.New,
+                Type = Domain.Models.OrderType.Shipped,
+                CreatedDateTimeUtc = Defaults.DateCreated,
+                CancelledDateTimeUtc = default,
+                CompletedDateTimeUtc = default,
+                Shipping = 5M,
+                TotalCost = 21.2M,
+                Customer = new()
+                {
+                    Id = Defaults.CustomerId,
+                    Name = Defaults.CustomerName,
+                    DateOfBirth = Defaults.CustomerDateOfBirth,
+                    DateHired = Defaults.CustomerDateHired,
+                    AnnualSalary = Defaults.CustomerAnnualSalary
+                },
+                ShippingAddress = new()
+                {
+                    Line1  = "1121 Ash Lane",
+                    Line2 = "Southwest",
+                    City  = "Beverly Hills",
+                    State  = "CA",
+                    ZipCode  = Defaults.ZipCode
+                },
+                Items = new()
+                {
+                    new()
+                    {
+                        MovieId = "tt1856101",
+                        MovieYear = "2017",
+                        MovieMetascore = "81",
+                        Quantity = 1,
+                        Price = 16.2M
+                    }
+                }  
+            })), Times.Once());
+    }
+
+
     [Fact(DisplayName = "Add order item should return internal server error when update fails")]
     public async Task Test10()
     {
