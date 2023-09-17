@@ -46,7 +46,7 @@ internal class OrdersRepository: IOrdersRepository
     #region Helpers
     private Order Map(OrderDataModel order)
     {
-        return new()
+        return new(order.Items.Select(a=> Map(a)))
         {
             Id = order.Id,
             Status = order.Status,
@@ -59,8 +59,7 @@ internal class OrdersRepository: IOrdersRepository
             DiscountTotal = order.DiscountTotal,
             Customer = Map(order.Customer),
             ShippingAddress = order.ShippingAddress is null? default: Map(order.ShippingAddress),
-            Discounts = order.Discounts.Select(a=> Map(a)).ToList(),
-            Items = order.Items.Select(a=> Map(a)).ToList()
+            Discounts = order.Discounts.Select(a=> Map(a)).ToList()
         };
     }
 

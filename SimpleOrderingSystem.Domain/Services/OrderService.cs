@@ -1,4 +1,3 @@
-using Jerry;
 using SimpleOrderingSystem.Domain.Models;
 using SimpleOrderingSystem.Domain.Providers;
 using SimpleOrderingSystem.Domain.Repositories;
@@ -169,7 +168,7 @@ internal class OrderService:IOrderService
             throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.MovieIdInvalid);
         }
 
-        BigPapa.DoIt(order, movie, request.Quantity.ToString(), false);
+        order.AddOrderItem(movie, request.Quantity);
 
         await _ordersRepository.UpdateOrderAsync(order);
 
@@ -191,15 +190,7 @@ internal class OrderService:IOrderService
                 $"Cannot add item to order because the order status does not allow adding items."); 
         }
 
-        var movie = order.Items.SingleOrDefault(a=>a.MovieId == request.MovieId);
-        if(movie is null)
-        {
-            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
-                $"Cannot remove item from order because item is not on this order.");
-        }
-        order.Items.Remove(movie);
-        
-        BigPapa.DoIt(order, default, null, false);
+        order.DeleteOrderItem(request.MovieId);
 
         await _ordersRepository.UpdateOrderAsync(order);
 
