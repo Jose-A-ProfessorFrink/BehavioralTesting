@@ -166,7 +166,7 @@ internal class OrderService:IOrderService
         if(order.Status != OrderStatus.New)
         {
             throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
-                $"Cannot add item to order because the order status does not allow adding items."); 
+                $"Cannot remove item to order because the order status does not allow removing items."); 
         }
 
         order.DeleteOrderItem(request.MovieId);
