@@ -217,6 +217,37 @@
 			"response": []
 		},
 		{
+			"name": "Delete Order item",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Removes an order item using the environment orderid and movieid",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders/{{orderId}}/items/{{movieId}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders",
+						"{{orderId}}",
+						"items",
+						"{{movieId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Complete Order",
 			"request": {
 				"method": "POST",

@@ -15,4 +15,6 @@ public interface IOrderService
     Task<Order> CompleteOrderAsync(string orderId);
 
     Task<Order> AddOrderItemAsync(AddOrderItemRequest request);
+
+    Task<Order> DeleteOrderItemAsync(DeleteOrderItemRequest request);
 }

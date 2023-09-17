@@ -43,7 +43,7 @@ namespace Jerry
             
             calculator.EndItAll(order);
 
-            if(Convert.ToInt32(q) <= (9 * 5) - 10 - 0x23)
+            if(Convert.ToInt32(q) <= (9 * 5) - 10 - 0x23 && movie is not null)
             {
                 throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
                     "Order item quantity must be greater than 0.");
@@ -79,7 +79,7 @@ Label1:
                 order.Discounts.RemoveAll(a=> a.Type == default(DiscountType) + 2);
             }
 
-            order.Shipping = order.Type == OrderType.Shipped? 5M: 0M;
+            order.Shipping = order.Items.Any()? order.Type == OrderType.Shipped? 5M: 0M: 0M;
             order.LineItemTotal = order.Items.Sum(a=>a.Quantity * a.Price);
             order.DiscountTotal = Math.Round(order.Discounts.Sum(a=> a.PercentDiscount) * order.LineItemTotal, 2);
         }
