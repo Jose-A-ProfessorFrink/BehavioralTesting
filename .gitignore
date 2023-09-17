@@ -208,3 +208,7 @@ _SpecRunner.html
 
 tilt_modules/
 out/
+
+# draw.io files
+*.drawio.bkp
+*.drawio.dtmp
