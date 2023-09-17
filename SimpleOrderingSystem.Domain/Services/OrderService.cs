@@ -59,7 +59,8 @@ internal class OrderService:IOrderService
             },
             Customer = customer,
             Shipping = 0M,
-            TotalCost = 0M      
+            DiscountTotal = 0M,
+            LineItemTotal = 0M      
         };
 
         await _ordersRepository.CreateOrderAsync(newOrder);

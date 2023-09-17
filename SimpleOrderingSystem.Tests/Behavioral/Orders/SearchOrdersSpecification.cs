@@ -29,7 +29,8 @@ public class SearchOrdersSpecification : IDisposable
             CancelledDateTimeUtc = default,
             CompletedDateTimeUtc = Defaults.DateCompleted,
             Shipping = 7.25M,
-            TotalCost = 105M,
+            LineItemTotal = 105M,
+            DiscountTotal = 5M,
             Customer = new()
             {
                 Id = Defaults.CustomerId,
@@ -111,7 +112,9 @@ public class SearchOrdersSpecification : IDisposable
                     CancelledDateTimeUtc = default,
                     CompletedDateTimeUtc = Defaults.DateCompleted,
                     Shipping = 7.25M,
-                    TotalCost = 105M,
+                    DiscountTotal = 5M,
+                    LineItemTotal = 105M,
+                    TotalCost = 107.25M,
                     Customer = new()
                     {
                         Id = Defaults.CustomerId,

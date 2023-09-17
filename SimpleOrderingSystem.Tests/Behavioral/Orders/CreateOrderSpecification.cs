@@ -39,7 +39,7 @@ public class CreateOrderSpecification : IDisposable
             CancelledDateTimeUtc = default,
             CompletedDateTimeUtc = Defaults.DateCompleted,
             Shipping = 7.25M,
-            TotalCost = 105M,
+            LineItemTotal = 105M,
             Customer = new()
             {
                 Id = Defaults.CustomerId,
@@ -306,7 +306,7 @@ public class CreateOrderSpecification : IDisposable
                 CancelledDateTimeUtc = default,
                 CompletedDateTimeUtc = default,
                 Shipping = default,
-                TotalCost = default,
+                LineItemTotal = default,
                 Customer = new()
                 {
                     Id = Defaults.CustomerId,

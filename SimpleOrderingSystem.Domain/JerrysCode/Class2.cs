@@ -12,8 +12,7 @@ namespace Jerry2
             new(1945, 2M),
             new(1970, 6M),
             new(2000, 12M),
-            new(2010, 15M),
-            new(2020, 20M),
+            new(2020, 15M),
         };
 
         public void CheckIt(Order? order, OrderItem[] orderItems, string? CodeSection)
@@ -26,25 +25,30 @@ namespace Jerry2
             {
                 goto Label2;
             }
+            if(!string.IsNullOrWhiteSpace(CodeSection))
+            {
+                goto Label0;
+            }
 
 Label:
             int total = 0;
             for(int i = 0; i < orderItems.Count(); i++)
             {
                 total = orderItems[i].Quantity + total;
-            }
-            if(total > Convert.ToUInt16(Toplevel))
-            {
-                throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
-                    "Unable to add items because that would exceed the maximum movies for a single order. An order can have up to 20 items.");
-            }
 
-            if(CodeSection is not null) return;
+                if(total > Convert.ToUInt16(Toplevel))
+                {
+                    throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                        "Unable to add items because that would exceed the maximum movies for a single order. An order can have up to 20 items.");
+                }
+            }
 
             foreach(OrderItem item in orderItems)
             {
                 BigPapa.calculator.PriceItem(item);
             }
+
+            if(CodeSection is not null) return;
             
 Label2:
             decimal a = Decimal.Zero;
@@ -74,7 +78,8 @@ Label2:
 
             if(CodeSection is not null) goto Exit;
             
-            BigPapa.DoIt(order, null, string.Empty, true);
+Label0:
+            BigPapa.DoIt(order!, null, string.Empty, true);
 Exit:
             return;
         }
@@ -84,8 +89,18 @@ Exit:
             this.CheckIt(null, orderItems, "Q");
         }
 
+        public void EndItAll(Order order)
+        {
+            this.CheckIt(order, null!, order.GetType().FullName);
+        }
+
         public void PriceItem(OrderItem item)
         {
+            if(item.Price != default)
+            {
+                return;
+            }
+
             try
             { 
                   var a = Int32.Parse(item.MovieYear!);
@@ -99,6 +114,8 @@ Exit:
                         return;
                     }
                   }
+
+                  item.Price = Math.Round(Magic1.Last().Item2 * b, 2);
             }
             catch
             {

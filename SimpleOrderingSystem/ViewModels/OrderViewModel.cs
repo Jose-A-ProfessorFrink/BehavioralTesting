@@ -9,6 +9,8 @@ public record OrderViewModel
     public AddressViewModel? ShippingAddress { get; init;} 
     public List<OrderItemViewModel> Items { get; init;} = new List<OrderItemViewModel>();
     public decimal Shipping { get; init;}
+    public decimal LineItemTotal { get; init;}
+    public decimal DiscountTotal {get;init;}
     public decimal TotalCost { get; init;}
     public List<OrderDiscountViewModel> Discounts {get; init;} = new List<OrderDiscountViewModel>();
     public DateTime CreatedDateTimeUtc { get; init;}

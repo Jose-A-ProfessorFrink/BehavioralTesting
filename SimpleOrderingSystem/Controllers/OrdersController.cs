@@ -140,6 +140,8 @@ public class OrdersController: ControllerBase
             CancelledDateTimeUtc = order.CancelledDateTimeUtc,
             CompletedDateTimeUtc = order.CompletedDateTimeUtc,
             Shipping = order.Shipping,
+            LineItemTotal = order.LineItemTotal,
+            DiscountTotal = order.DiscountTotal,
             TotalCost = order.TotalCost,
             Customer = Map(order.Customer),
             ShippingAddress = order.ShippingAddress is null? default: Map(order.ShippingAddress),

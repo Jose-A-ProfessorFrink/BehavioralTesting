@@ -10,8 +10,11 @@ public class Order
     public List<OrderItem> Items { get; init;} = new List<OrderItem>();
     public List<OrderDiscount> Discounts {get; init;} = new List<OrderDiscount>();
     public decimal Shipping { get; set;}
-    public decimal TotalCost { get; set;}
+    public decimal LineItemTotal {get ;set;}
+    public decimal DiscountTotal {get;set;}
     public DateTime CreatedDateTimeUtc { get; init;}
     public DateTime? CancelledDateTimeUtc {get; set;}
     public DateTime? CompletedDateTimeUtc {get; set;}
+
+    public decimal TotalCost => LineItemTotal + Shipping - DiscountTotal;
 }

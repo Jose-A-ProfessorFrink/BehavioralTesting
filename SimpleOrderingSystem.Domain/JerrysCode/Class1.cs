@@ -24,68 +24,32 @@ namespace Jerry
             }
             var items = order.Items;
 
+
             try
             {
-                var orderItem = default(OrderItem);
-                for(int i = 0; i < order.Items.Count; i++)
-                {
-                    if(order.Items[i].MovieId == movie!.Id)
-                    {
-                        orderItem = order.Items[i];
-                        orderItem.Quantity += Convert.ToInt32(q);
-                    }
-                }
-  
-                if(orderItem == null)
-                {
-                    items.Add(new OrderItem() { MovieId = movie!.Id, Quantity = Convert.ToInt32(q), MovieYear = movie.Year, MovieMetascore = movie.Metascore});
-                }
-
-                calculator.CheckIt(order, items.ToArray(), null);
+                var bagOJunk = items.ToDictionary(a=> a.MovieId, a=> a);
+                bagOJunk.Add(movie!.Id, 
+                    new OrderItem() { MovieId = movie!.Id, Quantity = Convert.ToInt32(q), MovieYear = movie.Year, MovieMetascore = movie.Metascore});
+                order.Items.Add(bagOJunk.Last().Value);
             }
             catch
             {
-                calculator.DiscountCheck(items.ToArray());    
-
-                PriceItAll(order);
-
-                calculator.CheckIt(order, order.Items.ToArray(), "W");
+                Rick.BadMath(order, movie!, q!);
             }
+
+            calculator.DiscountCheck(items.ToArray());    
+
+            calculator.CheckIt(order, order.Items.ToArray(), "W");
+            
+            calculator.EndItAll(order);
 
 Label1:
             BigPapa.Normalize(order);
         }
 
-        private static void PriceItAll(Order order)
-        {
-            foreach(var item in order.Items)
-            {
-                if(int.TryParse(item.MovieYear, out var year) && decimal.TryParse(item.MovieMetascore, out var metascore))
-                {
-                    metascore = metascore/100M;
-                }
-                else
-                {
-                    item.Price = Magic1;
-                    continue;
-                }
-
-                var basePrice = year switch
-                {
-                    int y when y <= 1945 => 2M,
-                    int y when y <= 1970 => 6M,
-                    int y when y <= 2000 => 12M,
-                    int y when y <= 2010 => 15M,
-                    _ => 20M
-                };
-
-                item.Price = Math.Round(basePrice * metascore, 2);             
-            }
-        }
-
         public static void Method1(Order order)
         {
-            if(order!.CreatedDateTimeUtc.Date.Year - order.Customer.DateHired.Year >= 10)
+            if(order!.CreatedDateTimeUtc.Date.Year - order.Customer.DateHired.Year >= 15)
             {
                 order.Discounts.Add(new OrderDiscount { Type = DiscountType.LoyalEmployee, PercentDiscount = .25M});
             }
@@ -95,7 +59,7 @@ Label1:
         {
             var flag1 = false;
             var flag2 = false;
-            if(order.Discounts.Select(a=>a.Type == DiscountType.SeniorCitizen) is not null)
+            if(order.Discounts.SingleOrDefault(a=>a.Type == DiscountType.SeniorCitizen) != null)
             {
                 flag1 = true;
             }
@@ -107,14 +71,12 @@ Label1:
 
             if(flag1 && flag2)
             {
-                order.Discounts.RemoveAll(a=> a.Type == (int)default(DiscountType));
+                order.Discounts.RemoveAll(a=> a.Type == default(DiscountType) + 2);
             }
 
-            order.Shipping = order.Items.Count > 3? order.Items.Count> 5? 10: 7: 5;
-            var a = order.Items.Sum(a=>a.Quantity * a.Price);
-            var b = order.Discounts.Sum(a=> a.PercentDiscount);
-            var c = Math.Round(a * (1-b), 2) + order.Shipping;
-            order.TotalCost = c;
+            order.Shipping = order.Type == OrderType.Shipped? 5M: 0M;
+            order.LineItemTotal = order.Items.Sum(a=>a.Quantity * a.Price);
+            order.DiscountTotal = Math.Round(order.Discounts.Sum(a=> a.PercentDiscount) * order.LineItemTotal, 2);
         }
     }
 }

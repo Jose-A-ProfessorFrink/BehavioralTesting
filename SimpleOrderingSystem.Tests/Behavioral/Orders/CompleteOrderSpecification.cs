@@ -28,7 +28,7 @@ public class CompleteOrderSpecification : IDisposable
             CancelledDateTimeUtc = default,
             CompletedDateTimeUtc = default,
             Shipping = 7.25M,
-            TotalCost = 105M,
+            LineItemTotal = 105M,
             Customer = new()
             {
                 Id = Defaults.CustomerId,
@@ -181,7 +181,8 @@ public class CompleteOrderSpecification : IDisposable
             CancelledDateTimeUtc = default,
             CompletedDateTimeUtc = Defaults.UtcNow,
             Shipping = 7.25M,
-            TotalCost = 105M,
+            LineItemTotal = 105M,
+            TotalCost = 112.25M,
             Customer = new()
             {
                 Id = Defaults.CustomerId,
@@ -230,7 +231,7 @@ public class CompleteOrderSpecification : IDisposable
                 CancelledDateTimeUtc = default,
                 CompletedDateTimeUtc = Defaults.UtcNow,
                 Shipping = 7.25M,
-                TotalCost = 105M,
+                LineItemTotal = 105M,
                 Customer = new()
                 {
                     Id = Defaults.CustomerId,

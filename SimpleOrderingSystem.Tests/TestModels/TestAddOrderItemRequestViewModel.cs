@@ -1,8 +1,8 @@
 namespace SimpleOrderingSystem.Tests.TestModels;
 
-public record TestAddOrderItemRequestViewModel
+public class TestAddOrderItemRequestViewModel
 {
-    public string MovieId {get; init;} =default!;
+    public string MovieId {get; set;} =default!;
 
-    public int? Quantity {get; init;}
+    public int? Quantity {get; set;}
 }

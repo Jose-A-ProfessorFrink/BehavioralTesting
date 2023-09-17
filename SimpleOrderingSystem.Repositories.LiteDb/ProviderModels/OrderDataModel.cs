@@ -11,7 +11,8 @@ internal record OrderDataModel
     public AddressDataModel? ShippingAddress { get; init;} = default!;
     public List<OrderItemDataModel> Items { get; init;} = new List<OrderItemDataModel>();
     public decimal Shipping { get; init;}
-    public decimal TotalCost { get; init;}
+    public decimal LineItemTotal { get; init;}
+    public decimal DiscountTotal {get;init;}
     public List<OrderDiscountDataModel> Discounts {get; init;} = new List<OrderDiscountDataModel>();
     public DateTime CreatedDateTimeUtc { get; init;}
     public DateTime? CancelledDateTimeUtc {get; init;}
