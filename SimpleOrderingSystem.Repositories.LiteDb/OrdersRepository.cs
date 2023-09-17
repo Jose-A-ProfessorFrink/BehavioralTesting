@@ -46,20 +46,21 @@ internal class OrdersRepository: IOrdersRepository
     #region Helpers
     private Order Map(OrderDataModel order)
     {
-        return new(order.Items.Select(a=> Map(a)))
+        return new(
+            order.Items.Select(a=> Map(a)), 
+            order.Discounts.Select(a=> Map(a)), 
+            order.Status, 
+            order.CompletedDateTimeUtc, 
+            order.CancelledDateTimeUtc)
         {
             Id = order.Id,
-            Status = order.Status,
             Type = order.Type,
             CreatedDateTimeUtc = order.CreatedDateTimeUtc,
-            CancelledDateTimeUtc = order.CancelledDateTimeUtc,
-            CompletedDateTimeUtc = order.CompletedDateTimeUtc,
             Shipping = order.Shipping,
             LineItemTotal = order.LineItemTotal,
             DiscountTotal = order.DiscountTotal,
             Customer = Map(order.Customer),
             ShippingAddress = order.ShippingAddress is null? default: Map(order.ShippingAddress),
-            Discounts = order.Discounts.Select(a=> Map(a)).ToList()
         };
     }
 

@@ -6,30 +6,46 @@ public class Order
     public const decimal LargeOrderDiscountThreshold = 100M;
 
     private readonly Dictionary<string, OrderItem> _orderItems;
+    private readonly List<OrderDiscount> _discounts;
+    private OrderStatus _orderStatus;
+    private DateTime? _completedDateTimeUtc;
+    private DateTime? _cancelledDateTimeUtc;
+    private int LineItemsTotalQuantity()  => _orderItems.Values.Sum(a=>a.Quantity);
+    private decimal LineItemsTotalPrice()  => _orderItems.Values.Sum(a=> a.Quantity * a.Price);
 
     public Guid Id { get; init;}
-    public OrderStatus Status { get; set;}
+    public OrderStatus Status => _orderStatus;
     public OrderType Type { get; init;}
     public Customer Customer { get; init;} = default!;
     public Address? ShippingAddress { get; init;} = default!;
     public IEnumerable<OrderItem> Items => _orderItems.Values;
-    public List<OrderDiscount> Discounts {get; init;} = new List<OrderDiscount>();
+    public IEnumerable<OrderDiscount> Discounts => _discounts;
     public decimal Shipping { get; set;}
     public decimal LineItemTotal {get ;set;}
     public decimal DiscountTotal {get;set;}
     public DateTime CreatedDateTimeUtc { get; init;}
-    public DateTime? CancelledDateTimeUtc {get; set;}
-    public DateTime? CompletedDateTimeUtc {get; set;}
+    public DateTime? CancelledDateTimeUtc => _cancelledDateTimeUtc;
+    public DateTime? CompletedDateTimeUtc => _completedDateTimeUtc;
 
     public decimal TotalCost => LineItemTotal + Shipping - DiscountTotal;
 
     public Order()
-        :this(Enumerable.Empty<OrderItem>())
+        :this(Enumerable.Empty<OrderItem>(), Enumerable.Empty<OrderDiscount>(), OrderStatus.New)
     {
+
     }
-    public Order(IEnumerable<OrderItem> orderItems)
+    public Order(
+        IEnumerable<OrderItem> orderItems, 
+        IEnumerable<OrderDiscount> discounts, 
+        OrderStatus orderStatus, 
+        DateTime? completedDateTimeUtc = default, 
+        DateTime? cancelledDateTimeUtc = default)
     {
         _orderItems = orderItems.ToDictionary(a=> a.MovieId, a=> a);
+        _discounts = discounts.ToList();
+        _orderStatus = orderStatus;
+        _completedDateTimeUtc = completedDateTimeUtc;
+        _cancelledDateTimeUtc = cancelledDateTimeUtc;
     }
 
     public void AddOrderItem(Movie movie, int quantity)
@@ -76,12 +92,38 @@ public class Order
             throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.MovieIdInvalid);
         }
     }
-    #region  Helpers
+    
+    public void Complete(DateTime dateTimeCompleted)
+    {
+        if(Status != OrderStatus.New)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot complete order because the order status does not allow completion."); 
+        }
 
-    private int LineItemsTotalQuantity() 
-        => _orderItems.Values.Sum(a=>a.Quantity);
-    private decimal LineItemsTotalPrice() 
-        => _orderItems.Values.Sum(a=> a.Quantity * a.Price);
+        if(!Items.Any())
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot complete order because the order does not contain any items!"); 
+        }
+
+        _orderStatus = OrderStatus.Completed;
+        _completedDateTimeUtc = dateTimeCompleted;
+    }
+
+    public void Cancel(DateTime dateTimeCancelled)
+    {
+        if(Status != OrderStatus.New)
+        {
+            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                $"Cannot cancel order because the order status does not allow cancellation."); 
+        }
+
+        _orderStatus = OrderStatus.Cancelled;
+        _cancelledDateTimeUtc = dateTimeCancelled;    
+    }
+    
+    #region  Helpers
 
     private decimal CalculateItemPrice(string? movieYear, string? movieMetascore)
     {
@@ -116,8 +158,8 @@ public class Order
 
     private void CalculatePricing()
     {
-        Discounts.Clear();
-        Discounts.AddRange(CalculateDiscounts());
+        _discounts.Clear();
+        _discounts.AddRange(CalculateDiscounts());
 
         Shipping = Type == OrderType.Shipped && _orderItems.Any()? 5M: 0M;
         LineItemTotal = LineItemsTotalPrice();
