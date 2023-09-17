@@ -85,7 +85,7 @@ public class OrdersController: ControllerBase
     }
 
     /// <summary>
-    /// Adds items to an existing order. Order must be in a New status.
+    /// Adds item to an existing order. Order must be in a New status.
     /// </summary>
     /// <param name="orderId"></param>
     /// <returns></returns>
@@ -98,6 +98,22 @@ public class OrdersController: ControllerBase
             OrderId = orderId,
             MovieId = request.MovieId,
             Quantity = request.Quantity.GetValueOrDefault(1)
+        }));
+    }
+
+    /// <summary>
+    /// Deletes item from an existing order. Order must be in a New status.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns></returns>
+    [Route("{orderId}/items/{movieId}")]
+    [HttpDelete]
+    public async Task<ActionResult<OrderViewModel>> DeleteOrderItem(string orderId, string movieId)
+    {
+        return Map(await _orderService.DeleteOrderItemAsync(new()
+        {
+            OrderId = orderId,
+            MovieId = movieId
         }));
     }
 
