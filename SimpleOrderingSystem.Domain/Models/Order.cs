@@ -119,7 +119,7 @@ public class Order
         Discounts.Clear();
         Discounts.AddRange(CalculateDiscounts());
 
-        Shipping = Type == OrderType.Shipped? 5M: 0M;
+        Shipping = Type == OrderType.Shipped && _orderItems.Any()? 5M: 0M;
         LineItemTotal = LineItemsTotalPrice();
         DiscountTotal = Math.Round(Discounts.Sum(a=> a.PercentDiscount) * LineItemTotal, 2);
     }
