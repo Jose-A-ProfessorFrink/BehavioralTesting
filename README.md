@@ -41,5 +41,10 @@ If you don't like this path, you can change it.
 Two convenience files for postman have been attached that make using the API even easier. You can import them
 into Postman and explore the API once you have it running locally. 
 
+[Behavioral test postman collection](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/Behavioral%20Tests.postman_collection.json)
+[Behavioral test postman environment](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/BehavioralTests.postman_environment.json)
+
+
+
 # Refactor examples
 See the following pull requests for a refactoring example.
