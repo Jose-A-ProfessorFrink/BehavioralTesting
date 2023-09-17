@@ -1,0 +1,365 @@
+{
+	"info": {
+		"_postman_id": "8d5395a4-4442-4753-9025-9b60b46198e2",
+		"name": "Behavioral Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2287737"
+	},
+	"item": [
+		{
+			"name": "Get Customers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"var item = jsonData.customers[Math.floor(Math.random()*jsonData.customers.length)];\r",
+							"postman.setEnvironmentVariable(\"customerId\", item.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//This request will do a search by name of customers and select a \r\n//result at random to store in the customerId environment variable",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Customers/search?name=rick",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Customers",
+						"search"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "rick"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"postman.setEnvironmentVariable(\"orderId\", jsonData.id)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Uses the customerId from the environment variable (see 'Get Customers')\r\n//to create a new shipped order\r\n{\r\n    \"customerId\": \"{{customerId}}\",\r\n    \"type\": \"Shipped\",\r\n    \"shippingAddress\": {\r\n        \"line1\": \"1121 Cherry Road\",\r\n        \"city\": \"Portland\",\r\n        \"state\": \"OR\",\r\n        \"zipCode\": \"97217\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Order",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Gets the current order using the orderId from the environment",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders/{{orderId}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Movies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"var item = jsonData.movies[Math.floor(Math.random()*jsonData.movies.length)];\r",
+							"postman.setEnvironmentVariable(\"movieId\", item.id);\r",
+							"postman.setEnvironmentVariable(\"itemQuantity\", Math.floor(Math.random()*4)+1);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// searches for movies (order items) by name and randomly \r\n// selects one from the results to store in the movieId variable.\r\n// Also randomly assigns a quantity from 1-5.",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Movies/search?name=blade",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Movies",
+						"search"
+					],
+					"query": [
+						{
+							"key": "CustomerId",
+							"value": "dsfgdfg",
+							"disabled": true
+						},
+						{
+							"key": "name",
+							"value": "blade"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Order Item",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Adds an item to the order using the environment settings of orderId, movieId and itemQuantity\r\n{\r\n  \"movieId\": \"{{movieId}}\",\r\n  \"quantity\": {{itemQuantity}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders/{{orderId}}/Items",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders",
+						"{{orderId}}",
+						"Items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Complete Order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Completes an order using the environment orderid",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders/{{orderId}}/complete",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders",
+						"{{orderId}}",
+						"complete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Order",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "//Cancels an order using the environment orderid",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders/{{orderId}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Orders",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// Searches for orders using the customerId from the environment",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders/search?customerId={{customerId}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders",
+						"search"
+					],
+					"query": [
+						{
+							"key": "CustomerId",
+							"value": "dsfgdfg",
+							"disabled": true
+						},
+						{
+							"key": "customerId",
+							"value": "{{customerId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Orders - All",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// searches all orders as far back as we can go",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/Orders/search?customerId={{customerId}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"Orders",
+						"search"
+					],
+					"query": [
+						{
+							"key": "CustomerId",
+							"value": "dsfgdfg",
+							"disabled": true
+						},
+						{
+							"key": "customerId",
+							"value": "{{customerId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
