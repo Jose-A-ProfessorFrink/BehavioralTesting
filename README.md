@@ -47,4 +47,6 @@ into Postman and explore the API once you have it running locally.
 
 
 # Refactor examples
-See the following pull requests for a refactoring example.
+See the following pull requests for refactoring examples:
+
+-[More Domain Driven Refactoring Approach](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/pull/1)
