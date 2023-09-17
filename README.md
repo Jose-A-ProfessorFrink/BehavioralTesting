@@ -10,7 +10,7 @@
 
  # Application Architecture
 
- ![Application Architecture](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/SimpleOrderingSystemArchitecture.drawio.png?raw=true)
+ ![Application Architecture](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/SimpleOrderingSystemArchitecture.jpg?raw=true)
 
  # Getting started (works with VS Code or Visual studio)
 
