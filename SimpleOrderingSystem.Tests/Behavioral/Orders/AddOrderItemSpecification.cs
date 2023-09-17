@@ -134,11 +134,13 @@ public class AddOrderItemSpecification : IDisposable
             "The supplied order id is invalid");
     }
 
-    [Fact(DisplayName = "Add order item should return bad request when trying to add item to order without New status")]
-    public async Task Test3()
+    [Theory(DisplayName = "Add order item should return bad request when trying to add item to order with status")]
+    [InlineData("completed", OrderStatus.Completed)]
+    [InlineData("cancelled", OrderStatus.Cancelled)]
+    public async Task Test3(string _, OrderStatus orderStatus)
     {
         // given the order is not new
-        _orderDataModel = _orderDataModel! with { Status = Domain.Models.OrderStatus.Completed};
+        _orderDataModel = _orderDataModel! with { Status = orderStatus};
 
         // when I add an order item
         var response = await AddOrderItemAsync(_orderId, _request);
@@ -163,6 +165,40 @@ public class AddOrderItemSpecification : IDisposable
         await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
             "MovieIdInvalid",
             "Invalid movie id was supplied. Please provide a valid imdb movie id (i.e. like 'tt3896198'). See https://developer.imdb.com/documentation/key-concepts#imdb-ids for more information.");
+    }
+
+    [Fact(DisplayName = "Add order item should return bad request when adding new order item with quantity of 0")]
+    public async Task Test4_1()
+    {
+        // given I set the request to add an order item with quantity 0
+        _request.Quantity = 0;
+
+        // when I add an order item
+        var response = await AddOrderItemAsync(_orderId, _request);
+
+        // the I expect the response to be the following error
+        await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
+            "InvalidRequest",
+            "There is something wrong with your request. Please see details for more information.",
+            "Order item quantity must be greater than 0."
+        );
+    }
+
+    [Fact(DisplayName = "Add order item should return bad request when adding new order item with quantity less than 0")]
+    public async Task Test4_2()
+    {
+        // given I set the request to add an order item with quantity 0
+        _request.Quantity = -5;
+
+        // when I add an order item
+        var response = await AddOrderItemAsync(_orderId, _request);
+
+        // the I expect the response to be the following error
+        await response.ShouldBeTheFollowingServiceExceptionBadRequestAsync(
+            "InvalidRequest",
+            "There is something wrong with your request. Please see details for more information.",
+            "Order item quantity must be greater than 0."
+        );
     }
 
     [Fact(DisplayName = "Add order item should return bad request when adding new order item with quantity greater than 20")]

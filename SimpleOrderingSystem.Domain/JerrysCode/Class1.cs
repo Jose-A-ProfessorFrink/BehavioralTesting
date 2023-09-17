@@ -43,6 +43,11 @@ namespace Jerry
             
             calculator.EndItAll(order);
 
+            if(Convert.ToInt32(q) <= (9 * 5) - 10 - 0x23)
+            {
+                throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
+                    "Order item quantity must be greater than 0.");
+            }
 Label1:
             BigPapa.Normalize(order);
         }
