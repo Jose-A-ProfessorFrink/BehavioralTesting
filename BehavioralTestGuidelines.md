@@ -5,11 +5,12 @@ In this article we will try to define by example the principles and patterns we 
 https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/
 ```
 
-You will need the following things:
--Visual Studio 2022 (or higher) Or VsCode 1.82.2 (or higher)
+You will need one of the following (vsCode is free):
+- [Visual Studio 2022 (or higher)](https://visualstudio.microsoft.com/vs/)
+- [VsCode 1.82.2 (or higher)](https://code.visualstudio.com/)
 
 Optionally, you might also want the following
--Postman
+- [Postman](https://www.postman.com/)
 
 ## Example application description
 The application we are working with is a simple internal company ordering site. We have customers, movies and orders. The customers come from our custom database which is this example is a simple liteDB file no sql document database. This database will be initiallized with random seed data the first time you run your application. Additionally, we rely on two free APIs as external data sources: one for movie information and another for zipcode information.
