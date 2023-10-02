@@ -28,6 +28,7 @@ We wish to have a set of tests that accomplish the following objectives:
 ## Application Architecture 
 
 ![Application Architecture](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystemArchitecture.jpg?raw=true)
+
 Everything within the green box represents what will be covered by our tests. The red box represents external boundaries that will not be covered by behavioral tests at all. This new layer, what we call the 'Provider' layer represents the lowest level conveniently mockable seam in our system. In some cases, this may be the 3rd party and/or framework interface itself. In other cases, it will be a custom wrapper we create explicitly to facilitate easy mocking and testing. We should strive to use the lowest level mockable interface possible that doesn't cross a process boundary and is easy to test. If no such thing exists, we should build the SIMPLEST, skinniest interface to accomodate that need. [GuidProvider.cs](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystem.Domain/Providers/GuidProvider.cs) is a good example of this.
 
 ## Anatomy of a behavioral test specification file
