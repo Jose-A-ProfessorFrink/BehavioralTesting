@@ -150,7 +150,7 @@ public async Task Test2()
 }
 ```
 
-####_Behavioral Test Naming_
+#### _Behavioral Test Naming_
 The first thing that should jump out at you is how descriptive the test name is. The name of the test is arguably one of the most important features of the test. It is written in very plain english and communicates an expected business behavior of the specific endpoint. Even without knowing much about 'coding', someone with elementary knowledge of our domain would quickly be able to understand what this test is trying to enshrine. When naming a test, the test should always follow this naming pattern:
 
 `<system> should <expected behavior> when <discriminating criteria>`
@@ -166,11 +166,11 @@ The first thing that should jump out at you is how descriptive the test name is.
 
 - The final bit of a test is the 'when <discriminating criteria>' part of the test. Please note that this part of the test is optional. Not all test cases will have discriminating criteria. It is perfectly legal to have a test without it. For example, I think we could all agree that the following test is perfectly valid: 'My boss should give me a raise'. If, however, you have a situation where the expectation is predicated on some other criteria, then that should always be included at the end of the test and specified by a 'when' keyword. Make sure you use 'when' as it keeps tests consistent. Your boss may insist you modify the test to be: 'My boss should give me a raise when I exceed expectations on my annual review and all my yearly projects were completed and the company has enough money'. Note how more than one discriminating criteria is chained with an 'and' keyword. Make sure you follow this pattern as well. Also note that you can have a long chain here. It is not as bad to have long chains in this part of the test, but try to keep it as short as possible. Again, if this becomes unwieldy, consider breaking it out into separate tests.
 
-####_Behavioral test method body_
+#### _Behavioral test method body_
 
 We should divide the test into three sections: Given, when and then. The given section should include statements that do necessary setup on the class level variables for the given behavior we expect. In this case, our test has one given statement that sets up the test to not find an order by manipulating our class level variable for the order mock (also note that in this specific case our code only works because we used a lambda to do deferred binding on the response for the mock). A test can contain zero or more given statements. Each statement should have an english like descriptive comment above it to help give an english-like flow to reading the scenario. Every test should contain one and ONLY one 'when' clause. This is a **_hard_** rule. There are no exceptions, anytime anywhere in the universe. The when should describe the action being invoked on the SUT. This will be the same within a given specification file for all the tests. Finally, the test should have a list of 1 or more 'then' assertions. It is important to note that there always should be at least ONE assertion. The assertions should each be described with an english like comment 'then ...'. The assertions should be clean and easy to read. 
 
-####_Behavioral test request and response objects_
+#### _Behavioral test request and response objects_
 
 You may have noticed that the type we use for the request in this specification file is a bit odd. The declaration code is listed below:
 
