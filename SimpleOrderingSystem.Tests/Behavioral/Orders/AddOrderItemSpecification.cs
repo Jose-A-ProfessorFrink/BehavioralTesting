@@ -8,6 +8,11 @@ using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Orders;
 
+/// <summary>
+/// This is a setup that is common for all scenarios in this specification class. Its responsibilities
+/// include mocking out all the wire dependencies and setting appropriate happy path defaults on the mocked
+/// out wire dependencies.
+/// </summary>
 public class AddOrderItemSpecification : IDisposable
 {
     // sut
@@ -74,7 +79,7 @@ public class AddOrderItemSpecification : IDisposable
     private TestAddOrderItemRequestViewModel _request = new()
     {
         MovieId = Defaults.MovieId,
-        Quantity = 1
+        Quantity = 20
     };
 
     public AddOrderItemSpecification()
@@ -331,6 +336,9 @@ public class AddOrderItemSpecification : IDisposable
     [Fact(DisplayName = "Add order item should calculate loyal employee discount correctly (order for employee that has 15 years seniority or more)")]
     public async Task Test9()
     {
+        // given I have a small order (to remove large order discount logic from running)
+        _request.Quantity = 1;
+
         // given I have an employee who is a loyal employee (calculated from order dates year only)
         _orderDataModel = _orderDataModel! with { Customer = _orderDataModel.Customer with { DateHired = new DateOnly(_orderDataModel.CreatedDateTimeUtc.Year - 15, 1, 1)}};
 
@@ -477,9 +485,6 @@ public class AddOrderItemSpecification : IDisposable
     [Fact(DisplayName = "Add order item should store new order in the database correctly and return the correct order data")]
     public async Task Test90()
     {
-        // given I have a high quantity to trigger a discount
-        _request.Quantity = 20;
-
         // when I add an order item
         var response = await AddOrderItemAsync(_orderId, _request);
 
