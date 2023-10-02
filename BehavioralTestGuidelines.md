@@ -1,5 +1,3 @@
-[[_TOC_]]
-
 ## Introduction
 In this article we will try to define by example the principles and patterns we use in behavioral testing. Since the goal of our testing strategy to maximize the amount of testing coverage we get through behavioral testing - understanding how to design, write and maintain these tests is the most important testing skill for you to develop. Before we get started, you will want to make sure you have this repository cloned.
 
