@@ -50,3 +50,10 @@ into Postman and explore the API once you have it running locally.
 See the following pull requests for refactoring examples:
 
 -[More Domain Driven Refactoring Approach](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/pull/1)
+
+
+# Getting started creating tests, guidelines and best practices
+For more detailed information on best practices and guidelines see the guide below. See how we break down 
+behavioral testing with examples and best patterns and practices.
+
+[Behavioral test guidelines](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/BehavioralTestGuidelines.md)
