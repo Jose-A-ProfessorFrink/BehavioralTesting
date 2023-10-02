@@ -1,4 +1,5 @@
 ## Introduction
+
 In this article we will try to define by example the principles and patterns we use in behavioral testing. Since the goal of our testing strategy to maximize the amount of testing coverage we get through behavioral testing - understanding how to design, write and maintain these tests is the most important testing skill for you to develop. Before we get started, you will want to make sure you have this repository cloned.
 
 ```
@@ -12,7 +13,8 @@ You will need one of the following (vsCode is free):
 Optionally, you might also want the following
 - [Postman](https://www.postman.com/)
 
-## Example application description
+## Description
+
 The application we are working with is a simple internal company ordering site. We have customers, movies and orders. The customers come from our custom database which is this example is a simple liteDB file no sql document database. This database will be initiallized with random seed data the first time you run your application. Additionally, we rely on two free APIs as external data sources: one for movie information and another for zipcode information.
 
 ## Motivation
@@ -23,15 +25,12 @@ We wish to have a set of tests that accomplish the following objectives:
 - Allow easy _refactor_ of internal implementations with no/minimal changes to tests themselves.
 - Be as fast(or close to it) as standard [solitary unit tests](https://martinfowler.com/bliki/UnitTest.html#SolitaryOrSociable)
 
-## Overview of test project used in examples
-The test project we will be using is a simple employee ordering system. Imagine you have the task of writing a small internal application where employees can order products from their company directly. We have three major concepts we deal with: Employees which represents the employees who can make orders, products which represents the products available and finally orders which represents an orders made. The system itself has a few noteworthy dependencies. It has a dependency on a mongo database to for storage and retrieval of employees, orders and products. The project also depends on a third party zip code web service as well as AWSSQS for publishing events. The project also has some internal classes that handle discounts and fees.
-
 ## Application Architecture 
+
 ![Application Architecture](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystemArchitecture.jpg?raw=true)
 Everything within the green box represents what will be covered by our tests. The red box represents external boundaries that will not be covered by behavioral tests at all. This new layer, what we call the 'Provider' layer represents the lowest level conveniently mockable seam in our system. In some cases, this may be the 3rd party and/or framework interface itself. In other cases, it will be a custom wrapper we create explicitly to facilitate easy mocking and testing. We should strive to use the lowest level mockable interface possible that doesn't cross a process boundary and is easy to test. If no such thing exists, we should build the SIMPLEST, skinniest interface to accomodate that need. [GuidProvider.cs](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystem.Domain/Providers/GuidProvider.cs) is a good example of this.
 
 ## Anatomy of a behavioral test specification file
-
 
 All behavioral tests are found in the behavioral test project. You will also find that there is a single specification file per endpoint in the solution. Organizing the tests around the endpoints is natural and makes sense. You should never have a specification file that covers more than a single endpoint. You may have valid reasons for having more than one specification file for a single endpoint. All tests are written using [XUnit](https://xunit.net/) and [FluentAssertions](https://fluentassertions.com/). The file we will be inspecting for this example is located [here](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystem.Tests/Behavioral/Orders/AddOrderItemSpecification.cs). 
 
@@ -44,6 +43,7 @@ Within each specification file you should have the following things:
 - Specification definitions (the actual tests) that have a domain readable (avoid technical jargon where possible) behavior they are testing. 
 
 ### Constructor
+
 The constructor is where most of the complexity of the specification file will live. Inside the constructor we will:
 1. Create an application builder (using the same code that the production application will use) that leverages the Microsoft TestServer and WebApplicationFactory.
 2. Mock out any wire dependencies that this particular code path may need (note that not you only need to mock out dependencies that your code will traverse. It is not required to mock out every _possible_ dependency). It IS required to mock out any other dependency causes us to cross a process boundary even ones we are not using. Often, for sad reasons, people/libraries do work in constructors (which is a bad practice BTW) and thus force us to mock out even dependencies we are not directly using. 
@@ -51,6 +51,7 @@ The constructor is where most of the complexity of the specification file will l
 4. In most cases the mocked function will have a return value which the code will rely on. In this case, you will also want to setup a _working 'happy path' default value_ for the mock to return for its expected calls. This default value should be stored in a class level variable so it can be manipulated to hold different values for different test scenarios. Additionally, the value should be bound using a _lambda_ not directly. By using a lambda for the value to be returned the binding is deferred until execution which allows us more flexibility in changing the value in the setup (to null for example) without having to 'rebind' the mock in the test. 
 
 #### Example
+
 Below is a snippet of a constructor for the add order item tests. You should be able to identity all the above items in this snippet. Give it a try.
 
 ```CSharp
