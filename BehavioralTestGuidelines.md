@@ -130,7 +130,7 @@ The last important trick we see here is in the 'Returns(' line. We use a lambda 
 
 With everything in place, our constructor code has setup our tests with the best possible scenario. In fact, if we have done it right, at this point we should be able to simply call the SUT in our test and expect the result to be successful.
 
-###Specification (the test)
+### Specification (the test)
 With all our setup in place, we should be ready to write our test cases. But first, lets take a moment to analyze a typical behavioral test. Please review the simple negative test case below.
 
 ```CSharp
@@ -186,7 +186,7 @@ If you inspect the solution, you will see that this [file](https://github.com/Jo
 
 `If you have an enum in the viewmodel, make sure in the testviewmodel you define this as a string. this will force you to check against the string which is the actual contract also protecting you from enum renames breaking contracts.`
 
-##Behavioral test - a success ('happy path') scenario
+## Behavioral test - a success ('happy path') scenario
 Next, lets analyze a test where we are testing a success case. The following test is a good candidate:
 
 ```CSharp
@@ -310,7 +310,7 @@ Because the setup is out of the way, when we read this test we are able to focus
 
 And this is pretty much it. This is what we have been fighting for all along. All the work we have done previously was to enable this watershed moment. You can think of these scenarios as each representing a specific ['kata'](https://en.wikipedia.org/wiki/Karate_kata) of your system. The tests within each scenario are the same kata with an ever so minor variation of steps.
 
-##Behavioral test theories
+## Behavioral test theories
 In some cases you may have a series of tests that are so similar they vary only by input data. For these types of tests you might elect to use xUnit theories. When you run into these cases, there are a few additional standards we like to follow. Here is an example:
 
 ```CSharp
