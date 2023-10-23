@@ -89,8 +89,11 @@ public class AddOrderItemSpecification : IDisposable
 
         // given I mock out the lite db provider and setup appropriate defaults
         _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>()
+            // the extension below is one we created because we use this setup in many other spec files. 
+            // while not strictly necessary, this can be a nice addition when you have a monolithic solution
+            // that will have many spec files for the same repositories.
             .SetupGetOrderAsync(() => _orderDataModel);
-            
+
         _liteDbProviderMock
             .Setup(a=> a.UpdateOrderAsync(It.IsAny<OrderDataModel>()))
             .ReturnsAsync(() => _updateResult);
