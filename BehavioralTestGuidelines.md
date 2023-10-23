@@ -43,6 +43,13 @@ Within each specification file you should have the following things:
 - A Default request. Although this is not a strict requirement, use it if it simplifies writing your test scenarios.
 - Specification definitions (the actual tests) that have a domain readable (avoid technical jargon where possible) behavior they are testing. 
 
+### Test Organization
+
+Regardless of the size of your solution (monolith or microservice), I would recommend you have a single behavioral test project per web application. In most cases, this will mean a single project. The folder structure of tests should loosely match the structure of the API project. In this case, we have a fairly simple solution so we simply map a folder name to the controller name. If we had background processes, we might choose to create a higher level folder underneath the 'Behavioral' folder. These are some very good rules and guidelines:
+- You should have a DEDICATED folder for every controller
+- The above folder should contain a at least a dedicated specification file for every endpoint. So, if you have 7 endpoints in a given controller, you should have at least 7 specification files. Never test more than one endpoint from one specification file. 
+- If you need to have multiple specification files for a single endpoint (this will happen with overly large or complex endpoints), this is totally valid but make sure then create a folder for that endpoint and put each specification file under that folder. For example, if we wanted to have two specification files for the 'AddOrderItem' endpoint in this solution, we should create the following folder: Behavioral -> Orders -> AddOrderItem and then place specification files under than new folder 'AddOrderItem'. 
+
 ### Constructor
 
 The constructor is where most of the complexity of the specification file will live. Inside the constructor we will:
@@ -184,7 +191,7 @@ private TestAddOrderItemRequestViewModel _request = new()
 
 If you inspect the solution, you will see that this [file](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystem.Tests/TestModels/TestAddOrderItemRequestViewModel.cs) is defined in the test project. You may also notice that this file is eerily similar to the file that is [defined in the actual API project](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystem/ViewModels/AddOrderItemRequestViewModel.cs). Why have we done this? One principle we try to follow is we do not use the SUT to validate the SUT. In the end, our contract with the outside world is JSON not actual C# objects. By definining these test classes as separate from the actual objects the production code uses, we avoid the dreaded 'unwitting refactor/rename contract change' breaking our service by changing an external contract. This can occur when a developer renames a viewmodel property. Always create a dedicated test class for every viewmodel. Make sure you name this class 'Test<ClassName>'. This convention makes it easy to distinguish our test classes from the actual view model classes the application serves up in production. 
 
-`If you have an enum in the viewmodel, make sure in the testviewmodel you define this as a string. this will force you to check against the string which is the actual contract also protecting you from enum renames breaking contracts.`
+`If you have an enum in the viewmodel, make sure in the testviewmodel you define this as a string or equivalent TestxxxEnum. this will force you to check against a value that is not the SUT protecting you from enum renames breaking contracts.`
 
 ## Behavioral test - a success ('happy path') scenario
 Next, lets analyze a test where we are testing a success case. The following test is a good candidate:
@@ -345,7 +352,7 @@ public async Task Test6(string _, string movieYear, string metascore, decimal ex
 }
 ```
 
-The structure of the test follows all the same rules for test naming with one key distinction: The criteria that sets each test apart from each other in this theory is giving a meaningful English description in the form of when criteria of the main test. In this way, we can understand the test by simply concatenating the display name of the theory with each respective inline datas first string parameter. So, for example, to understand the second case in this theory, we would say 'Add order item should calculate item price correctly when movie has no known metascore'. This is necessary because we _need_ to have a proper English description for the test itself. It is not good enough to rely on the naked parameter data. By convention, I always give this parameter the `_` value. This makes it clear it is a discard and it shows up nicely in the test output window.
+The structure of the test follows all the same rules for test naming with one key distinction: The criteria that sets each test apart from each other in this theory is giving a meaningful English description in the form of when criteria of the main test. In this way, we can understand the test by simply concatenating the display name of the theory with each respective inline datas first string parameter. So, for example, to understand the third case in this theory, we would say 'Add order item should calculate item price correctly when movie has no known metascore'. This is necessary because we _need_ to have a proper English description for the test itself. It is not good enough to rely on the naked parameter data. By convention, I always give this parameter the `_` value. This makes it clear it is a discard and it shows up nicely in the test output window.
 
 The addition of the `_` will give warnings about an unused parameter. Until there is a better solution in place for `InlineData()` that accepts a test name we need to suppress the compiler warning (challenge to readers, you could add this as a feature request and PR to the XUnit library...).
 
