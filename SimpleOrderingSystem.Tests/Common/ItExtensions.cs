@@ -1,5 +1,7 @@
 using FluentAssertions.Equivalency;
 
+namespace SimpleOrderingSystem.Tests.Common;
+
 /// <summary>
 /// Moq and FluentAssertions together as one. A better <see cref="It"/>
 /// For cases when a failed setup match must fail the test.

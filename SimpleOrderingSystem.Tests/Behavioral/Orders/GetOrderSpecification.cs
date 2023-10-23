@@ -74,10 +74,8 @@ public class GetOrderSpecification : IDisposable
         _webApplicationFactory = WebApplicationFactory.Create();
 
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>();
-        _liteDbProviderMock
-            .Setup(a=>a.GetOrderAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(() => _orderDataModel);
+        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>()
+            .SetupGetOrderAsync(() => _orderDataModel);
     }
 
     [Fact(DisplayName = "Get order should return not found when order id is invalid")]

@@ -93,13 +93,11 @@ public class CreateOrderSpecification : IDisposable
         _webApplicationFactory = WebApplicationFactory.Create();
 
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>();
+        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>()
+            .SetupGetOrderAsync(() => _orderDataModel);
         _liteDbProviderMock
             .Setup(a=>a.GetCustomerAsync(It.IsAny<Guid>()))
             .ReturnsAsync(() => _customerDataModel);
-        _liteDbProviderMock
-            .Setup(a=>a.GetOrderAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(() => _orderDataModel);
 
         // given I mock out the zipcodeprovider and setup valid defaults
         _zipCodeProviderMock = _webApplicationFactory.Mock<IZipCodeProvider>();
