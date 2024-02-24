@@ -13,10 +13,10 @@ public static class ConfigurableWebApplicationFactoryExtensions
     /// <typeparam name="T">Type of the mocked object.</typeparam>
     /// <param name="factory"></param>
     /// <returns></returns>
-    public static Mock<T> Mock<T>(this IConfigurableWebApplicationFactory factory)
+    public static Mock<T> Mock<T>(this IConfigurableWebApplicationFactory factory, MockBehavior behavior = MockBehavior.Default)
         where T : class
     {
-        var mock = new Mock<T>();
+        var mock = new Mock<T>(behavior);
 
         factory.ConfigureTestServices(sc =>
         {

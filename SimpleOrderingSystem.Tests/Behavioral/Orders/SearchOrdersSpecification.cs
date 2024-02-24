@@ -8,10 +8,10 @@ using SimpleOrderingSystem.Domain.Providers;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Orders;
 
-public class SearchOrdersSpecification : IDisposable
+public class SearchOrdersSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -74,22 +74,25 @@ public class SearchOrdersSpecification : IDisposable
         }
     };
 
-    public SearchOrdersSpecification()
+    public SearchOrdersSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
         // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create();
+        webApplicationFactory.Setup();
 
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>();
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>();
         _liteDbProviderMock
             .Setup(a=>a.SearchOrdersAsync(It.IsAny<DateTime>(),It.IsAny<Guid?>()))
             .ReturnsAsync(() => _orderDataModelList);
 
         // given I mock out the datetime provider and setup valid defaults
-        _dateTimeProviderMock = _webApplicationFactory.Mock<IDateTimeProvider>();
+        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>();
         _dateTimeProviderMock
             .Setup(a=> a.UtcNow())
             .Returns(() => Defaults.UtcNow);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Search orders should return valid order data from database and invoke database with correct parameters when no search criteria are supplied")]
@@ -214,12 +217,7 @@ public class SearchOrdersSpecification : IDisposable
             queryString.Add("noOlderThan", noOlderThan.Value.ToString()); // noOlderThan.Value.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"));
         }
 
-        return await _webApplicationFactory.CreateClient().GetAsync($"Orders/search?{queryString}");
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await _httpClient.GetAsync($"Orders/search?{queryString}");
     }
 
     #endregion

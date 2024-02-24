@@ -5,10 +5,10 @@ using SimpleOrderingSystem.Repositories.LiteDB.Providers;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Customers;
 
-public class SearchCustomersSpecification : IDisposable
+public class SearchCustomersSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -35,21 +35,23 @@ public class SearchCustomersSpecification : IDisposable
     };
 
     // custom application settings
-    private Dictionary<string,string> _appSettings = new()
+    private Dictionary<string,string?> _appSettings = new()
     {
         {"LiteDbConnectionString", "Blah"}
     };
 
-    public SearchCustomersSpecification()
+    public SearchCustomersSpecification(WebApplicationFactoryFixture webApplicationFactoryFixture)
     {
         // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create((a) => a.AddInMemoryCollection(_appSettings));
+        webApplicationFactoryFixture.Setup(_appSettings);
 
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>();
+        _liteDbProviderMock = webApplicationFactoryFixture.Mock<ILiteDbProvider>();
         _liteDbProviderMock
             .Setup(a=>a.SearchCustomersAsync(It.IsAny<string>()))
             .ReturnsAsync(() => _customerSearchResults);
+
+        _httpClient = webApplicationFactoryFixture.CreateClient();
     }
 
     [Fact(DisplayName = "Search customer should return bad request when search is less than 2 characters")]
@@ -147,12 +149,7 @@ public class SearchCustomersSpecification : IDisposable
 
     public async Task<HttpResponseMessage> SearchCustomerAsync(string name)
     {
-        return await _webApplicationFactory.CreateClient().GetAsync($"Customers/search?name={name}");
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await this._httpClient.GetAsync($"Customers/search?name={name}");
     }
 
     #endregion

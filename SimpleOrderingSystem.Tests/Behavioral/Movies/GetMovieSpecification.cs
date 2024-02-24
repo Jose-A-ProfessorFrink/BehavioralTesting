@@ -4,10 +4,10 @@ using SimpleOrderingSystem.Repositories.Http.ProviderModels;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Customers;
 
-public class GetMovieSpecification : IDisposable
+public class GetMovieSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
     private readonly Mock<IMovieProvider> _movieProviderMock;
@@ -30,21 +30,24 @@ public class GetMovieSpecification : IDisposable
     };
 
     // custom application settings
-    private Dictionary<string,string> _appSettings = new()
+    private Dictionary<string,string?> _appSettings = new()
     {
         {"OmdbApiKey", Defaults.MovieServiceApiKey}
     };
 
-    public GetMovieSpecification()
+    public GetMovieSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
         // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create((a) => a.AddInMemoryCollection(_appSettings));
+        webApplicationFactory.Setup(_appSettings);
 
         // given I mock out the movie provider and setup appropriate defaults
-        _movieProviderMock = _webApplicationFactory.Mock<IMovieProvider>();
+        _movieProviderMock = webApplicationFactory.Mock<IMovieProvider>();
         _movieProviderMock
             .Setup(a=>a.GetMovieAsync(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(() => _getMovieApiResponse);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Get movie should return not found when movie id is invalid")]
@@ -89,12 +92,7 @@ public class GetMovieSpecification : IDisposable
 
     public async Task<HttpResponseMessage> GetMovieAsync(string movieId)
     {
-        return await _webApplicationFactory.CreateClient().GetAsync($"Movies/{movieId}");
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await this._httpClient.GetAsync($"Movies/{movieId}");
     }
 
     #endregion

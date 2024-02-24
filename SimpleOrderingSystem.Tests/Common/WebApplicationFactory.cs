@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using SimpleOrderingSystem;
-
 namespace SimpleOrderingSystem.Tests.Common;
 
 /// <summary>
@@ -14,8 +11,8 @@ public sealed class WebApplicationFactory : ConfigurableWebApplicationFactory<St
     /// </summary>
     /// <param name="removeHostedServicesExcept"></param>
     /// <param name="testConfiguration"></param>
-    public WebApplicationFactory(Action<IConfigurationBuilder>? testConfiguration = null)
-        : base(testConfiguration)
+    public WebApplicationFactory(ConfigurableWebApplicationFactoryOptions options)
+        : base(options)
     {
 
     }
@@ -25,10 +22,8 @@ public sealed class WebApplicationFactory : ConfigurableWebApplicationFactory<St
     /// </summary>
     /// <param name="testConfiguration"></param>
     /// <returns></returns>
-    public static WebApplicationFactory Create(
-        Action<IConfigurationBuilder>? testConfiguration = null)
+    public static WebApplicationFactory Create(Dictionary<string,string?> testConfiguration)
     {
-        return new(testConfiguration);
+        return new(ConfigurableWebApplicationFactoryOptions.CreateDefaultBehavioralOptions(testConfiguration));
     }
-
 }

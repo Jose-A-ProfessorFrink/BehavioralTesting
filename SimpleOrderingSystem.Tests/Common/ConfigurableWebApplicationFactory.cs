@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SimpleOrderingSystem.Tests.Common;
@@ -15,15 +14,15 @@ public class ConfigurableWebApplicationFactory<TEntryPoint> : WebApplicationFact
     where TEntryPoint : class
 {
     private readonly List<Action<IServiceCollection>> _testServiceConfigurations = new();
-    private readonly Action<IConfigurationBuilder>? _testConfiguration;
+    private readonly ConfigurableWebApplicationFactoryOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigurableWebApplicationFactory{TEntryPoint}"/> class.
     /// </summary>
     /// <param name="configuration"></param>
-    public ConfigurableWebApplicationFactory(Action<IConfigurationBuilder>? configuration = null)
+    public ConfigurableWebApplicationFactory(ConfigurableWebApplicationFactoryOptions options)
     {
-        _testConfiguration = configuration;
+        _options = options;
     }
 
     /// <summary>
@@ -41,6 +40,9 @@ public class ConfigurableWebApplicationFactory<TEntryPoint> : WebApplicationFact
     /// <param name="builder"></param>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // setup command line arguments
+        _options.CommandLineArguments?.Invoke()?.ToList().ForEach(a => builder.UseSetting(a.Key, a.Value.ToString()));
+
         builder.ConfigureTestServices(sc =>
         {
             foreach (var testServiceConfiguration in _testServiceConfigurations)
@@ -49,9 +51,13 @@ public class ConfigurableWebApplicationFactory<TEntryPoint> : WebApplicationFact
             }
         });
 
-        if (_testConfiguration != null)
+        if (this._options.TestConfiguration is not null)
         {
-            builder.ConfigureAppConfiguration(_testConfiguration);
+            // apply our test configuration
+            builder.ConfigureAppConfiguration(this._options.TestConfiguration);
         }
+
+        // remove the hosted services as specified by our options
+        //builder.RemoveAllHostedServices(this._options.HostedServiceFilter);
     }
 }
