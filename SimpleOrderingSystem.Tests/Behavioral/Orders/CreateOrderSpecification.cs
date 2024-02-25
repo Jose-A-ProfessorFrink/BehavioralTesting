@@ -8,10 +8,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Orders;
 
-public class CreateOrderSpecification : IDisposable
+public class CreateOrderSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -87,37 +87,27 @@ public class CreateOrderSpecification : IDisposable
         }
     };
 
-    public CreateOrderSpecification()
+    public CreateOrderSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create();
-
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>();
-        _liteDbProviderMock
-            .Setup(a=>a.GetCustomerAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(() => _customerDataModel);
-        _liteDbProviderMock
-            .Setup(a=>a.GetOrderAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(() => _orderDataModel);
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
+            .WithDefault(() => _orderDataModel)
+            .WithDefault(() => _customerDataModel);
 
         // given I mock out the zipcodeprovider and setup valid defaults
-        _zipCodeProviderMock = _webApplicationFactory.Mock<IZipCodeProvider>();
-        _zipCodeProviderMock
-            .Setup(a=> a.GetZipCodeAsync(It.IsAny<string>(),It.IsAny<string>()))
-            .ReturnsAsync(() => _getZipCodeApiResponse);
+        _zipCodeProviderMock = webApplicationFactory.Mock<IZipCodeProvider>()
+            .WithDefault(() => _getZipCodeApiResponse);
 
         // given I mock out the datetime provider and setup valid defaults
-        _dateTimeProviderMock = _webApplicationFactory.Mock<IDateTimeProvider>();
-        _dateTimeProviderMock
-            .Setup(a=> a.UtcNow())
-            .Returns(() => Defaults.UtcNow);
+        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>()
+            .WithDefault(() => Defaults.UtcNow);
 
         // given I mock out the guid provider and setup valid defaults
-        _guidProviderMock = _webApplicationFactory.Mock<IGuidProvider>();
-        _guidProviderMock
-            .Setup(a=> a.NewGuid())
-            .Returns(() => Defaults.OrderId);
+        _guidProviderMock = webApplicationFactory.Mock<IGuidProvider>()
+            .WithDefault(() => Defaults.OrderId);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Create order should return bad request when required fields are not supplied")]
@@ -339,20 +329,11 @@ public class CreateOrderSpecification : IDisposable
         response.ShouldBeInternalServerError();
     }
 
-
-
-
-
     #region Helpers
 
     public async Task<HttpResponseMessage> CreateOrderAsync(TestCreateOrderRequestViewModel request)
     {
-        return await _webApplicationFactory.CreateClient().PostAsJsonAsync($"Orders", request);
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await _httpClient.PostAsJsonAsync($"Orders", request);
     }
 
     #endregion

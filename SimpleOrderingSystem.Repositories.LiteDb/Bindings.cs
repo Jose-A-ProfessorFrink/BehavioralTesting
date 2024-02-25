@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleOrderingSystem.Domain.Extensions;
 using LiteDB;
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
+using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.Repositories.LiteDB;
 
@@ -27,7 +30,8 @@ public static class Bindings
         services
             .AddSingleton<ILiteDbProvider>(serviceProvider => 
             {
-                var connectionString = configuration.GetValue<string>("LiteDbConnectionString");
+
+                var connectionString = serviceProvider.GetRequiredService<IOptions<SimpleOrderingSystemOptions>>().Value.LiteDbConnectionString!;
 
                 var provider = new LiteDbProvider(connectionString);
 

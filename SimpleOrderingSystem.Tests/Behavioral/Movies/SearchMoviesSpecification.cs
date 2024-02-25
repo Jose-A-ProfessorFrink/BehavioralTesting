@@ -2,15 +2,18 @@
 using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Repositories.Http.Providers;
 using SimpleOrderingSystem.Repositories.Http.ProviderModels;
+using Microsoft.Extensions.Options;
+using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Customers;
 
-public class SearchMoviesSpecification : IDisposable
+public class SearchMoviesSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
+    private readonly Mock<IOptions<SimpleOrderingSystemOptions>> simpleOrderingSystemOptionsMock;
     private readonly Mock<IMovieProvider> _movieProviderMock;
     
     // default return objects bound to mocks
@@ -39,22 +42,23 @@ public class SearchMoviesSpecification : IDisposable
         }
     };
 
-    // custom application settings
-    private Dictionary<string,string> _appSettings = new()
+    public SearchMoviesSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        {"OmdbApiKey", Defaults.MovieServiceApiKey}
-    };
-
-    public SearchMoviesSpecification()
-    {
-        // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create((a) => a.AddInMemoryCollection(_appSettings));
+        // given I mock out the configuration and have it return a valid default
+        simpleOrderingSystemOptionsMock = webApplicationFactory.Mock<IOptions<SimpleOrderingSystemOptions>>();
+        simpleOrderingSystemOptionsMock.Setup(a => a.Value).Returns(() => new SimpleOrderingSystemOptions()
+        {
+            OmdbApiKey = Defaults.MovieServiceApiKey
+        });
 
         // given I mock out the movie provider and setup appropriate defaults
-        _movieProviderMock = _webApplicationFactory.Mock<IMovieProvider>();
+        _movieProviderMock = webApplicationFactory.Mock<IMovieProvider>();
         _movieProviderMock
             .Setup(a=>a.SearchMoviesAsync(It.IsAny<string>(),It.IsAny<string>()))
             .ReturnsAsync(() => _searchMoviesResults);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Search movie should return bad request when search name is empty")]
@@ -136,12 +140,7 @@ public class SearchMoviesSpecification : IDisposable
 
     public async Task<HttpResponseMessage> SearchMoviesAsync(string name)
     {
-        return await _webApplicationFactory.CreateClient().GetAsync($"Movies/search?name={name}");
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await _httpClient.GetAsync($"Movies/search?name={name}");
     }
 
     #endregion

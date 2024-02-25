@@ -6,10 +6,10 @@ using SimpleOrderingSystem.Repositories.LiteDB.ProviderModels;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Orders;
 
-public class GetOrderSpecification : IDisposable
+public class GetOrderSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -68,16 +68,14 @@ public class GetOrderSpecification : IDisposable
             }
     };
 
-    public GetOrderSpecification()
+    public GetOrderSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create();
-
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>();
-        _liteDbProviderMock
-            .Setup(a=>a.GetOrderAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(() => _orderDataModel);
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
+            .SetupGetOrderAsync(() => _orderDataModel);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Get order should return not found when order id is invalid")]
@@ -173,12 +171,7 @@ public class GetOrderSpecification : IDisposable
 
     public async Task<HttpResponseMessage> GetOrderAsync(string orderId)
     {
-        return await _webApplicationFactory.CreateClient().GetAsync($"Orders/{orderId}");
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await _httpClient.GetAsync($"Orders/{orderId}");
     }
 
     #endregion
