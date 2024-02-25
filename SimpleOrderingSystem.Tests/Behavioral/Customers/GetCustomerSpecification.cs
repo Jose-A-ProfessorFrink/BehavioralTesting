@@ -27,19 +27,16 @@ public class GetCustomerSpecification : IClassFixture<WebApplicationFactoryFixtu
         {"LiteDbConnectionString", "Blah"}
     };
 
-    public GetCustomerSpecification(WebApplicationFactoryFixture webApplicationFactoryFixture)
+    public GetCustomerSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        webApplicationFactoryFixture.Setup(_appSettings);
-
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = webApplicationFactoryFixture.Mock<ILiteDbProvider>();
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>();
         _liteDbProviderMock
             .Setup(a=>a.GetCustomerAsync(It.IsAny<Guid>()))
             .ReturnsAsync(() => _customerDataModel);
 
         // given I have a client
-        _httpClient = webApplicationFactoryFixture.CreateClient();
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Get customer should return not found when invalid customer id(not Guid parseable) is used")]

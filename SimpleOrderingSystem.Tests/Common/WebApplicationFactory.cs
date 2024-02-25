@@ -9,8 +9,7 @@ public sealed class WebApplicationFactory : ConfigurableWebApplicationFactory<St
     /// Initializes a new instance of the <see cref="WebApplicationFactory"/> class.
     /// Removes all hosted services except the one specified. If not specified, removes all.
     /// </summary>
-    /// <param name="removeHostedServicesExcept"></param>
-    /// <param name="testConfiguration"></param>
+    /// <param name="options"></param>
     public WebApplicationFactory(ConfigurableWebApplicationFactoryOptions options)
         : base(options)
     {
@@ -20,10 +19,10 @@ public sealed class WebApplicationFactory : ConfigurableWebApplicationFactory<St
     /// <summary>
     /// Creates a web application factory
     /// </summary>
-    /// <param name="testConfiguration"></param>
+    /// <param name="commandLineArguments"></param>
     /// <returns></returns>
-    public static WebApplicationFactory Create(Dictionary<string,string?> testConfiguration)
+    public static WebApplicationFactory Create(Dictionary<string, object>? commandLineArguments = null)
     {
-        return new(ConfigurableWebApplicationFactoryOptions.CreateDefaultBehavioralOptions(testConfiguration));
+        return new(ConfigurableWebApplicationFactoryOptions.CreateDefaultBehavioralOptions(commandLineArguments));
     }
 }

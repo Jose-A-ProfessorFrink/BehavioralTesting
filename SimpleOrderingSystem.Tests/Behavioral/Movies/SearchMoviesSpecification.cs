@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Repositories.Http.Providers;
 using SimpleOrderingSystem.Repositories.Http.ProviderModels;
+using Microsoft.Extensions.Options;
+using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Customers;
 
@@ -11,6 +13,7 @@ public class SearchMoviesSpecification : IClassFixture<WebApplicationFactoryFixt
     private readonly HttpClient _httpClient;
 
     // mocks
+    private readonly Mock<IOptions<SimpleOrderingSystemOptions>> simpleOrderingSystemOptionsMock;
     private readonly Mock<IMovieProvider> _movieProviderMock;
     
     // default return objects bound to mocks
@@ -39,16 +42,14 @@ public class SearchMoviesSpecification : IClassFixture<WebApplicationFactoryFixt
         }
     };
 
-    // custom application settings
-    private Dictionary<string,string?> _appSettings = new()
-    {
-        {"OmdbApiKey", Defaults.MovieServiceApiKey}
-    };
-
     public SearchMoviesSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        webApplicationFactory.Setup(_appSettings);
+        // given I mock out the configuration and have it return a valid default
+        simpleOrderingSystemOptionsMock = webApplicationFactory.Mock<IOptions<SimpleOrderingSystemOptions>>();
+        simpleOrderingSystemOptionsMock.Setup(a => a.Value).Returns(() => new SimpleOrderingSystemOptions()
+        {
+            OmdbApiKey = Defaults.MovieServiceApiKey
+        });
 
         // given I mock out the movie provider and setup appropriate defaults
         _movieProviderMock = webApplicationFactory.Mock<IMovieProvider>();

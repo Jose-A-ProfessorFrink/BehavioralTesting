@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleOrderingSystem.Domain.Models;
 using SimpleOrderingSystem.Domain.Providers;
 using SimpleOrderingSystem.Domain.Services;
 

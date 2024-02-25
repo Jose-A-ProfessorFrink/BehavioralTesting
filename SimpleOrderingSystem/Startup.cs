@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using SimpleOrderingSystem.Domain;
 using SimpleOrderingSystem.Repositories.Http;
 using SimpleOrderingSystem.Repositories.LiteDB;
+using Microsoft.Extensions.DependencyInjection;
+using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem;
 
@@ -59,6 +61,8 @@ public class Startup
             .RegisterDomain(_configuration)
             .RegisterHttpProviders(_configuration)
             .RegisterLiteDbProviders(_configuration);
+
+        services.Configure<SimpleOrderingSystemOptions>(_configuration);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace SimpleOrderingSystem.Tests.Common;
 
@@ -7,11 +6,6 @@ public record ConfigurableWebApplicationFactoryOptions
 {
     public static readonly Func<ServiceDescriptor, bool> HostedServiceFilterRemoveAll = (a) => true;
     public static readonly Func<ServiceDescriptor, bool> HostedServiceFilterRemoveNone = (a) => false;
-
-    /// <summary>
-    /// Defines changes you want to apply to the configuration
-    /// </summary>
-    public Action<IConfigurationBuilder>? TestConfiguration { get; init; }
 
     /// <summary>
     /// A function that returns a set of command line arguments you wish to pass to the startup routine
@@ -30,7 +24,6 @@ public record ConfigurableWebApplicationFactoryOptions
     /// <param name="commandLineArguments"></param>
     /// <returns></returns>
     public static ConfigurableWebApplicationFactoryOptions CreateDefaultBehavioralOptions(
-        Dictionary<string, string?>? testConfiguration = null,
         Dictionary<string, object>? commandLineArguments = null)
     {
         return new()
@@ -41,14 +34,6 @@ public record ConfigurableWebApplicationFactoryOptions
 
 
                 return commandLineArguments;
-            },
-            TestConfiguration = a =>
-            {
-                //inject any custom configuration the user supplies.
-                if (testConfiguration is not null)
-                {
-                    a.AddInMemoryCollection(testConfiguration);
-                }
             },
             HostedServiceFilter = ConfigurableWebApplicationFactoryOptions.HostedServiceFilterRemoveAll
         };

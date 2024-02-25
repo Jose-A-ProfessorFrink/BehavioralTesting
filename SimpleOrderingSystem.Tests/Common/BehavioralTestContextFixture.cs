@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Memory;
+using System.Diagnostics;
 
 namespace SimpleOrderingSystem.Tests.Common;
 
@@ -15,23 +18,12 @@ public class BehavioralTestContextFixture<TEntryPoint> : IDisposable
     private HttpClient? _client;
 
     /// <summary>
-    /// Setup for the fixture which creates the initial web application factory and bindings for its test configuration and command line arguments.
-    /// NOTEL: Only the FIRST call to this will honored. Any subsequent calls will be ignored.
+    /// Optional: Setup for bindings for web application factory command line arguments.
+    /// NOTE: these are created only ONCE for each instance of a <see cref="BehavioralTestContextFixture{TEntryPoint}"/>. If you need
+    /// to have your command line parameters vary per test, you must use the <see cref="WebApplicationFactory"/> directly instead.
     /// </summary>
-    /// <param name="testConfiguration"></param>
     /// <returns></returns>
-    public void Setup(
-        Dictionary<string, string?>? testConfiguration = null,
-        Dictionary<string, object>? commandLineArguments = null)
-    {
-        if (HasBeenSetup)
-        {
-            return;
-        }
-
-        _webApplicationFactory = new ConfigurableWebApplicationFactory<TEntryPoint>(
-            ConfigurableWebApplicationFactoryOptions.CreateDefaultBehavioralOptions(testConfiguration, commandLineArguments));
-    }
+    protected virtual Dictionary<string, object>? CommandLineArguments() => default;
 
     /// <summary>
     /// Create a new mock of the given type and adds it to the underlying <see cref="IConfigurableWebApplicationFactory"/>.
@@ -107,7 +99,8 @@ public class BehavioralTestContextFixture<TEntryPoint> : IDisposable
         {
             if (!HasBeenSetup)
             {
-                throw new InvalidOperationException($"You must call '{nameof(Setup)}' first.");
+                _webApplicationFactory = new ConfigurableWebApplicationFactory<TEntryPoint>(
+                    ConfigurableWebApplicationFactoryOptions.CreateDefaultBehavioralOptions(CommandLineArguments()));
             }
 
             return _webApplicationFactory!;

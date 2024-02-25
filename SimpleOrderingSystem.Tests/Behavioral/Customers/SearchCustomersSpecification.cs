@@ -40,18 +40,15 @@ public class SearchCustomersSpecification : IClassFixture<WebApplicationFactoryF
         {"LiteDbConnectionString", "Blah"}
     };
 
-    public SearchCustomersSpecification(WebApplicationFactoryFixture webApplicationFactoryFixture)
+    public SearchCustomersSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        webApplicationFactoryFixture.Setup(_appSettings);
-
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = webApplicationFactoryFixture.Mock<ILiteDbProvider>();
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>();
         _liteDbProviderMock
             .Setup(a=>a.SearchCustomersAsync(It.IsAny<string>()))
             .ReturnsAsync(() => _customerSearchResults);
 
-        _httpClient = webApplicationFactoryFixture.CreateClient();
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Search customer should return bad request when search is less than 2 characters")]

@@ -84,9 +84,6 @@ public class CompleteOrderSpecification : IClassFixture<WebApplicationFactoryFix
 
     public CompleteOrderSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        webApplicationFactory.Setup();
-
         // given I mock out the lite db provider and setup appropriate defaults
         _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
             .SetupGetOrderAsync(() => _orderDataModel);

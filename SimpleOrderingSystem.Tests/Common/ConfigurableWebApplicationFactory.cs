@@ -42,7 +42,6 @@ public class ConfigurableWebApplicationFactory<TEntryPoint> : WebApplicationFact
     {
         // setup command line arguments
         _options.CommandLineArguments?.Invoke()?.ToList().ForEach(a => builder.UseSetting(a.Key, a.Value.ToString()));
-
         builder.ConfigureTestServices(sc =>
         {
             foreach (var testServiceConfiguration in _testServiceConfigurations)
@@ -50,14 +49,7 @@ public class ConfigurableWebApplicationFactory<TEntryPoint> : WebApplicationFact
                 testServiceConfiguration(sc);
             }
         });
-
-        if (this._options.TestConfiguration is not null)
-        {
-            // apply our test configuration
-            builder.ConfigureAppConfiguration(this._options.TestConfiguration);
-        }
-
         // remove the hosted services as specified by our options
-        //builder.RemoveAllHostedServices(this._options.HostedServiceFilter);
+        builder.RemoveAllHostedServices(this._options.HostedServiceFilter);
     }
 }

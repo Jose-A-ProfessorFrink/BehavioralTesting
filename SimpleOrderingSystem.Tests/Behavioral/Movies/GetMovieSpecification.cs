@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Repositories.Http.Providers;
 using SimpleOrderingSystem.Repositories.Http.ProviderModels;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging.Console;
+using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Customers;
 
@@ -10,6 +13,7 @@ public class GetMovieSpecification : IClassFixture<WebApplicationFactoryFixture>
     private readonly HttpClient _httpClient;
 
     // mocks
+    private readonly Mock<IOptions<SimpleOrderingSystemOptions>> simpleOrderingSystemOptionsMock;
     private readonly Mock<IMovieProvider> _movieProviderMock;
     
     // default return objects bound to mocks
@@ -29,16 +33,14 @@ public class GetMovieSpecification : IClassFixture<WebApplicationFactoryFixture>
         Error = default
     };
 
-    // custom application settings
-    private Dictionary<string,string?> _appSettings = new()
-    {
-        {"OmdbApiKey", Defaults.MovieServiceApiKey}
-    };
-
     public GetMovieSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        webApplicationFactory.Setup(_appSettings);
+        // given I mock out the configuration and have it return a valid default
+        simpleOrderingSystemOptionsMock = webApplicationFactory.Mock<IOptions<SimpleOrderingSystemOptions>>();
+        simpleOrderingSystemOptionsMock.Setup(a => a.Value).Returns(() => new SimpleOrderingSystemOptions() 
+        { 
+            OmdbApiKey = Defaults.MovieServiceApiKey
+        });
 
         // given I mock out the movie provider and setup appropriate defaults
         _movieProviderMock = webApplicationFactory.Mock<IMovieProvider>();
@@ -64,7 +66,7 @@ public class GetMovieSpecification : IClassFixture<WebApplicationFactoryFixture>
     }
 
     [Fact(DisplayName = "Get movie should return correct movie data from service and invoke service with correct parameters")]
-    public async Task Test3()
+    public async Task Test2()
     {
         // when I get a customer
         var response = await GetMovieAsync(Defaults.MovieId);
