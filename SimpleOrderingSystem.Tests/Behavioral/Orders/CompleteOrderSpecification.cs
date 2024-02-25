@@ -8,10 +8,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Orders;
 
-public class CompleteOrderSpecification : IDisposable
+public class CompleteOrderSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -82,13 +82,10 @@ public class CompleteOrderSpecification : IDisposable
         }
     };
 
-    public CompleteOrderSpecification()
+    public CompleteOrderSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create();
-
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>()
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
             .SetupGetOrderAsync(() => _orderDataModel);
             
         _liteDbProviderMock
@@ -96,10 +93,13 @@ public class CompleteOrderSpecification : IDisposable
             .ReturnsAsync(() => _updateResult);
 
         // given I mock out the datetime provider and setup valid defaults
-        _dateTimeProviderMock = _webApplicationFactory.Mock<IDateTimeProvider>();
+        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>();
         _dateTimeProviderMock
             .Setup(a=> a.UtcNow())
             .Returns(() => Defaults.UtcNow);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Complete order should return bad request with appropriate error code when order id is invalid")]
@@ -286,12 +286,7 @@ public class CompleteOrderSpecification : IDisposable
 
     public async Task<HttpResponseMessage> CompleteOrderAsync(string? orderId)
     {
-        return await _webApplicationFactory.CreateClient().PostAsync($"Orders/{orderId}/complete" , default);
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await _httpClient.PostAsync($"Orders/{orderId}/complete" , default);
     }
 
     #endregion

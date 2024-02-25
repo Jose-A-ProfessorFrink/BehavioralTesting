@@ -16,7 +16,7 @@ namespace SimpleOrderingSystem.Tests.Behavioral.Orders;
 public class AddOrderItemSpecification : IDisposable
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly WebApplicationFactory webApplicationFactory;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -85,10 +85,10 @@ public class AddOrderItemSpecification : IDisposable
     public AddOrderItemSpecification()
     {
         // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create();
+        webApplicationFactory = WebApplicationFactory.Create();
 
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>()
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
             // the extension below is one we created because we use this setup in many other spec files. 
             // while not strictly necessary, this can be a nice addition when you have a monolithic solution
             // that will have many spec files for the same repositories.
@@ -99,13 +99,13 @@ public class AddOrderItemSpecification : IDisposable
             .ReturnsAsync(() => _updateResult);
 
         // given I mock out the movie provider and setup appropriate defaults
-        _movieProviderMock = _webApplicationFactory.Mock<IMovieProvider>();
+        _movieProviderMock = webApplicationFactory.Mock<IMovieProvider>();
         _movieProviderMock
             .Setup(a=>a.GetMovieAsync(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(() => _getMovieApiResponse);
 
         // given I mock out the datetime provider and setup valid defaults
-        _dateTimeProviderMock = _webApplicationFactory.Mock<IDateTimeProvider>();
+        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>();
         _dateTimeProviderMock
             .Setup(a=> a.UtcNow())
             .Returns(() => Defaults.UtcNow);
@@ -609,12 +609,12 @@ public class AddOrderItemSpecification : IDisposable
 
     public async Task<HttpResponseMessage> AddOrderItemAsync(string? orderId, TestAddOrderItemRequestViewModel request)
     {
-        return await _webApplicationFactory.CreateClient().PostAsJsonAsync($"Orders/{orderId}/items" , request);
+        return await webApplicationFactory.CreateClient().PostAsJsonAsync($"Orders/{orderId}/items" , request);
     }
 
     public void Dispose()
     {
-        _webApplicationFactory.Dispose();
+        this.webApplicationFactory?.Dispose();
     }
 
     #endregion

@@ -4,15 +4,16 @@ using SimpleOrderingSystem.Repositories.Http.Providers;
 using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Domain.Models;
 using SimpleOrderingSystem.Domain.Repositories;
+using Microsoft.Extensions.Options;
 
 namespace SimpleOrderingSystem.Repositories.Http;
 
 internal class ZipCodeRepository:IZipCodeRepository
 {
     private readonly IZipCodeProvider _zipCodeProvider;
-    private readonly IConfiguration _configuration;
+    private readonly IOptions<SimpleOrderingSystemOptions> _configuration;
 
-    public ZipCodeRepository(IZipCodeProvider zipCodeProvider, IConfiguration configuration)
+    public ZipCodeRepository(IZipCodeProvider zipCodeProvider,  IOptions<SimpleOrderingSystemOptions> configuration)
     {
         _zipCodeProvider = zipCodeProvider;
         _configuration = configuration;
@@ -37,7 +38,7 @@ internal class ZipCodeRepository:IZipCodeRepository
 
     #region Helpers
 
-    private string ApiKey => _configuration.GetRequiredValue("ZipwiseApiKey");
+    private string ApiKey => _configuration.Value.ZipwiseApiKey!;
 
     private ZipCodeInformation Map(GetZipCodeApiResponse response)
     {

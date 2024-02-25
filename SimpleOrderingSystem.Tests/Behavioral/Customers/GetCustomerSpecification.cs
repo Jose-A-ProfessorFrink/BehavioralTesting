@@ -1,14 +1,12 @@
-
-using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Repositories.LiteDB.ProviderModels;
 using SimpleOrderingSystem.Repositories.LiteDB.Providers;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Customers;
 
-public class GetCustomerSpecification : IDisposable
+public class GetCustomerSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -24,21 +22,21 @@ public class GetCustomerSpecification : IDisposable
     };
 
     // custom application settings
-    private Dictionary<string,string> _appSettings = new()
+    private Dictionary<string,string?> _appSettings = new()
     {
         {"LiteDbConnectionString", "Blah"}
     };
 
-    public GetCustomerSpecification()
+    public GetCustomerSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create((a) => a.AddInMemoryCollection(_appSettings));
-
         // given I mock out the lite db provider and setup appropriate defaults
-        _liteDbProviderMock = _webApplicationFactory.Mock<ILiteDbProvider>();
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>();
         _liteDbProviderMock
             .Setup(a=>a.GetCustomerAsync(It.IsAny<Guid>()))
             .ReturnsAsync(() => _customerDataModel);
+
+        // given I have a client
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Get customer should return not found when invalid customer id(not Guid parseable) is used")]
@@ -91,12 +89,7 @@ public class GetCustomerSpecification : IDisposable
 
     public async Task<HttpResponseMessage> GetCustomerAsync(string customerId)
     {
-        return await _webApplicationFactory.CreateClient().GetAsync($"Customers/{customerId}");
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await this._httpClient.GetAsync($"Customers/{customerId}");
     }
 
     #endregion

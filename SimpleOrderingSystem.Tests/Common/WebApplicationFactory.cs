@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using SimpleOrderingSystem;
-
 namespace SimpleOrderingSystem.Tests.Common;
 
 /// <summary>
@@ -12,10 +9,9 @@ public sealed class WebApplicationFactory : ConfigurableWebApplicationFactory<St
     /// Initializes a new instance of the <see cref="WebApplicationFactory"/> class.
     /// Removes all hosted services except the one specified. If not specified, removes all.
     /// </summary>
-    /// <param name="removeHostedServicesExcept"></param>
-    /// <param name="testConfiguration"></param>
-    public WebApplicationFactory(Action<IConfigurationBuilder>? testConfiguration = null)
-        : base(testConfiguration)
+    /// <param name="options"></param>
+    public WebApplicationFactory(ConfigurableWebApplicationFactoryOptions options)
+        : base(options)
     {
 
     }
@@ -23,12 +19,10 @@ public sealed class WebApplicationFactory : ConfigurableWebApplicationFactory<St
     /// <summary>
     /// Creates a web application factory
     /// </summary>
-    /// <param name="testConfiguration"></param>
+    /// <param name="commandLineArguments"></param>
     /// <returns></returns>
-    public static WebApplicationFactory Create(
-        Action<IConfigurationBuilder>? testConfiguration = null)
+    public static WebApplicationFactory Create(Dictionary<string, object>? commandLineArguments = null)
     {
-        return new(testConfiguration);
+        return new(ConfigurableWebApplicationFactoryOptions.CreateDefaultBehavioralOptions(commandLineArguments));
     }
-
 }

@@ -1,15 +1,19 @@
 using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Repositories.Http.Providers;
 using SimpleOrderingSystem.Repositories.Http.ProviderModels;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging.Console;
+using SimpleOrderingSystem.Domain.Models;
 
 namespace SimpleOrderingSystem.Tests.Behavioral.Customers;
 
-public class GetMovieSpecification : IDisposable
+public class GetMovieSpecification : IClassFixture<WebApplicationFactoryFixture>
 {
     // sut
-    private readonly WebApplicationFactory _webApplicationFactory;
+    private readonly HttpClient _httpClient;
 
     // mocks
+    private readonly Mock<IOptions<SimpleOrderingSystemOptions>> simpleOrderingSystemOptionsMock;
     private readonly Mock<IMovieProvider> _movieProviderMock;
     
     // default return objects bound to mocks
@@ -29,22 +33,23 @@ public class GetMovieSpecification : IDisposable
         Error = default
     };
 
-    // custom application settings
-    private Dictionary<string,string> _appSettings = new()
+    public GetMovieSpecification(WebApplicationFactoryFixture webApplicationFactory)
     {
-        {"OmdbApiKey", Defaults.MovieServiceApiKey}
-    };
-
-    public GetMovieSpecification()
-    {
-        // given I have a web application factory
-        _webApplicationFactory = WebApplicationFactory.Create((a) => a.AddInMemoryCollection(_appSettings));
+        // given I mock out the configuration and have it return a valid default
+        simpleOrderingSystemOptionsMock = webApplicationFactory.Mock<IOptions<SimpleOrderingSystemOptions>>();
+        simpleOrderingSystemOptionsMock.Setup(a => a.Value).Returns(() => new SimpleOrderingSystemOptions() 
+        { 
+            OmdbApiKey = Defaults.MovieServiceApiKey
+        });
 
         // given I mock out the movie provider and setup appropriate defaults
-        _movieProviderMock = _webApplicationFactory.Mock<IMovieProvider>();
+        _movieProviderMock = webApplicationFactory.Mock<IMovieProvider>();
         _movieProviderMock
             .Setup(a=>a.GetMovieAsync(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(() => _getMovieApiResponse);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Get movie should return not found when movie id is invalid")]
@@ -61,7 +66,7 @@ public class GetMovieSpecification : IDisposable
     }
 
     [Fact(DisplayName = "Get movie should return correct movie data from service and invoke service with correct parameters")]
-    public async Task Test3()
+    public async Task Test2()
     {
         // when I get a customer
         var response = await GetMovieAsync(Defaults.MovieId);
@@ -89,12 +94,7 @@ public class GetMovieSpecification : IDisposable
 
     public async Task<HttpResponseMessage> GetMovieAsync(string movieId)
     {
-        return await _webApplicationFactory.CreateClient().GetAsync($"Movies/{movieId}");
-    }
-
-    public void Dispose()
-    {
-        _webApplicationFactory.Dispose();
+        return await this._httpClient.GetAsync($"Movies/{movieId}");
     }
 
     #endregion

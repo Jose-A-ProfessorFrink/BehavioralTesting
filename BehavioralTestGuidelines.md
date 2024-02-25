@@ -368,6 +368,111 @@ Provide a compiler suppression pragma which can be included in a global suppress
 
 Even though we can do theories, let me be the first to say that we should probably avoid them in all but the most appropriate cases (which I will describe below). Part of the benefit of our setup steps is that our tests do NOT have a high setup cost. This diminishes one of the main benefits of consolidating test cases into a theory. You will pay a 'complexity tax' with theories. Again, don't be 'cute' trying to squeeze every drop of reuse you can. It is not the best approach. Ok, so with all that being said - you might rightly ask 'why is this a theory at all then?' It is a fair question, and my answer here would be because the functionality being tested is very cohesive within this domain. Since the price calculations just vary a bit, it actually makes more sense (or at least AS much) from a documentation point of view to put the tests together. Note this argument has NOTHING to do with code reuse and everything to do with the readability and documentation value of the tests. That should always be one of your most primary concerns. 
 
+## Advanced topics 
+There are some additional topics that are worth covering for specific scenarios you might run into. You might have noticed the other specification files in the solution look slightly different than the specification file we used above in our examples. These other specification files are taking advantage of some optimizations that may make sense in your particular situation. The also include some alternative approaches you might find convenient for setups etc. Lastly, I have some lessons learned for other 'gotchas' that might burn you. 
+
+### Optimization: Reusing the web application factory
+Recently, when working with a monolith that had a need for possibly thousands of tests, I found a need to create a solution that would allow us to run tests as quickly as possible.  If you look at the following code [taken from this specification](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystem.Tests/Behavioral/Customers/SearchCustomersSpecification.cs), you will see the following differences:
+
+- For starters, the class declares a Fixture. Class fixtures are an [XUnit feature](https://xunit.net/docs/shared-context#class-fixture) that allow us to specify an object that is reused for the entire duration of all tests within a single test class file. In our case, our 'SearchCustomersSpecification' class. Note that XUnit will execute all tests within a single class serially (non parallel) so concurrency is not a concern. 
+```CSharp
+
+public class SearchCustomersSpecification : IClassFixture<WebApplicationFactoryFixture>
+
+```
+- In order to use the fixture, we simply inject it into the constructor of the test class, as we did below. Please note how the syntax we use here is identical for the syntax we use when using the WebApplicationFactory class. This is no accident. I wanted to maintain syntactic parity as much as possible between both approaches. The only difference you might notice is that we have an additional call to create the http client which we also capture as a class level variable now. Please note that while this is not technically necessary to do here, it does make the test a bit cleaner by allowing us to no longer have to keep a reference to the WebApplicationFactoryFixture. Why is this cleaner? The WebApplicationFactoryFixture allows you to setup new mocks. If we capture it as a class level variable, developers might be tempted to try to mock out new things in individual tests. This is a bad practice. For behavioral testing, we should mock out everything we could need UPFRONT in the constructor, then only have access to those mocks in the actual test specifications. More importantly, in the case of using the WebApplicationFactoryFixture pattern, it simply won't work. This is because under the covers the WebApplicationFactoryFixture creates a client whenever the first test is run and then reuses the same client when any subsequent test is run. Normally, this is anathema to testing because it introduces shared state across tests. Remember though, that this is an optimization and we are allowed to sacrifice any sacred principle on the alter of performance. Additionally, we have taken several steps to minimize any shared state issues. The WebApplicationFactoryFixture stores a dictionary of Mocks that are created and internally manages it so the same instance is returned whenever .Mock is called during its lieftime. If resets mocks everytime one is requested however, so previous tests state will be erased when the constructor is run for the subsequent test. Additionally, the http client is created to be stateless so calls are independent. The SUT becomes our http client (which is actually the most accurate representation) and thus every individual test in the specification class can only mess around with the finite set of mocks it has that were set in the constructor and invoke the http client. Again, tests will never run in parallel within a single specification so this is totally safe. By making this tweak, we can SIGNIFICANTLY increase the speed of the tests. 
+```CSharp
+
+public class SearchCustomersSpecification : IClassFixture<WebApplicationFactoryFixture>
+{
+    // sut
+    private readonly HttpClient _httpClient;
+
+    ...
+
+    public SearchCustomersSpecification(WebApplicationFactoryFixture webApplicationFactory)
+    {
+        // given I mock out the lite db provider and setup appropriate defaults
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>();
+        _liteDbProviderMock
+            .Setup(a=>a.SearchCustomersAsync(It.IsAny<string>()))
+            .ReturnsAsync(() => _customerSearchResults);
+
+        // given I have an http client.
+        _httpClient = webApplicationFactory.CreateClient();
+    }
+
+```
+
+### Convenience: Ditch the verbose Setup syntax for a shorter default syntax
+The next thing worth mentioning is how we setup valid defaults for all of our mocks in behavioral testing. In the previous examples, we relied on the trust Mock.Setup(...) function to bind a method on a mock to some class level variable that represents a working default. While this works just fine, it has a couple drawbacks:
+- The syntax is quite verbose. You must specify the method name in a lambda along with a legion of It.IsAny parameters that are quite boring to write.
+- Programmers can often forget the rule that parameters for a function should be setup with It.IsAny (unless there is a two call scenario where you need truly different results in which case you might bend this rule). In this case, they will mix the concerns of validation with working defaults which is bad. 
+It would be nice to be able to just say 'Any calls to this method should return this object'. Although we cannot do something quite like that, we can get very close leveraging a nifty feature in Moq called 'DefaultValueProviders'. Lets take a look at the [Create Order Specification](https://github.com/Jose-A-ProfessorFrink/BehavioralTesting/blob/main/SimpleOrderingSystem.Tests/Behavioral/Orders/CreateOrderSpecification.cs):
+```CSharp
+
+    public CreateOrderSpecification(WebApplicationFactoryFixture webApplicationFactory)
+    {
+        // given I mock out the lite db provider and setup appropriate defaults
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
+            .WithDefault(() => _orderDataModel)
+            .WithDefault(() => _customerDataModel);
+
+        // given I mock out the zipcodeprovider and setup valid defaults
+        _zipCodeProviderMock = webApplicationFactory.Mock<IZipCodeProvider>()
+            .WithDefault(() => _getZipCodeApiResponse);
+
+        // given I mock out the datetime provider and setup valid defaults
+        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>()
+            .WithDefault(() => Defaults.UtcNow);
+
+        // given I mock out the guid provider and setup valid defaults
+        _guidProviderMock = webApplicationFactory.Mock<IGuidProvider>()
+            .WithDefault(() => Defaults.OrderId);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
+    }
+
+```
+Above we see that we are creating a mock and then just specifying a default using a custom fluent extension 'WithDefault'. This function basically instructs the mock to return the value for any function invoked on the mock that returns that type (this works for both sync and async). In most cases when we are mocking a class, the class will not have many functions that return the same type that are also being used as part of our testing path. So in these cases, this approach will be functionally equivalent to the more verbose:
+```CSharp
+
+    public CreateOrderSpecification(WebApplicationFactoryFixture webApplicationFactory)
+    {
+        // given I mock out the lite db provider and setup appropriate defaults
+        _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
+            .SetupGetOrderAsync(() => _orderDataModel);
+        _liteDbProviderMock
+            .Setup(a=>a.GetCustomerAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(() => _customerDataModel);
+
+        // given I mock out the zipcodeprovider and setup valid defaults
+        _zipCodeProviderMock = webApplicationFactory.Mock<IZipCodeProvider>();
+        _zipCodeProviderMock
+            .Setup(a=> a.GetZipCodeAsync(It.IsAny<string>(),It.IsAny<string>()))
+            .ReturnsAsync(() => _getZipCodeApiResponse);
+
+        // given I mock out the datetime provider and setup valid defaults
+        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>();
+        _dateTimeProviderMock
+            .Setup(a=> a.UtcNow())
+            .Returns(() => Defaults.UtcNow);
+
+        // given I mock out the guid provider and setup valid defaults
+        _guidProviderMock = webApplicationFactory.Mock<IGuidProvider>();
+        _guidProviderMock
+            .Setup(a=> a.NewGuid())
+            .Returns(() => Defaults.OrderId);
+
+        // given I have an HttpClient
+        _httpClient = webApplicationFactory.CreateClient();
+    }
+
+```
+It also has the benefit that developers cannot be tempted to setup parameter expectations. Please note that you may run into particularly nasty situations where you will have to fall back to a more verbose strategy but my guess is that if you are coding cleanly and well, you should almost always be able to use a strategy like this. 
+
+
 ## Final thoughts: The right tool for the job
 
 Behavioral tests are great for capturing high level business requirements. Often, we can capture all our functional requirements rather easily using this style of testing and generate fantastic documentation along the way. However, there are situations where some other form of unit testing makes more sense. Heavily algorithmic code might be an example of this (maybe even for the pricing calculation we used a theory for above). Something like a US State code validation algorithm might benefit more from plain old Solitary Unit testing. In that case, you might opt for a simple unit test and that may even be a better solution for maintainability. While I do not agree with everything [this page](https://www.practitest.com/resource-center/article/black-box-vs-white-box-testing/) is saying, I do agree with the point they make about using white box testing for heavy algorithm testing. 

@@ -4,16 +4,18 @@ using SimpleOrderingSystem.Repositories.Http.Providers;
 using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Domain.Models;
 using SimpleOrderingSystem.Domain.Repositories;
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
 
 namespace SimpleOrderingSystem.Repositories.Http;
 
 internal class MoviesRepository:IMoviesRepository
 {
     private readonly IMovieProvider _movieProvider;
-    private readonly IConfiguration _configuration;
+    private readonly IOptions<SimpleOrderingSystemOptions> _configuration;
     private const string InvalidResponseCode = "False";
 
-    public MoviesRepository(IMovieProvider movieProvider,IConfiguration configuration)
+    public MoviesRepository(IMovieProvider movieProvider, IOptions<SimpleOrderingSystemOptions> configuration)
     {
         _movieProvider = movieProvider;
         _configuration = configuration;
@@ -50,7 +52,7 @@ internal class MoviesRepository:IMoviesRepository
 
     #region Helpers
 
-    private string ApiKey => _configuration.GetRequiredValue("OmdbApiKey");
+    private string ApiKey => _configuration.Value.OmdbApiKey!;
 
     private MovieSummary Map(SearchMoviesResult movie)
     {
