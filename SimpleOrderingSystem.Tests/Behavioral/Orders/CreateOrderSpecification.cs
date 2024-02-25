@@ -91,28 +91,20 @@ public class CreateOrderSpecification : IClassFixture<WebApplicationFactoryFixtu
     {
         // given I mock out the lite db provider and setup appropriate defaults
         _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
-            .SetupGetOrderAsync(() => _orderDataModel);
-        _liteDbProviderMock
-            .Setup(a=>a.GetCustomerAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(() => _customerDataModel);
+            .WithDefault(() => _orderDataModel)
+            .WithDefault(() => _customerDataModel);
 
         // given I mock out the zipcodeprovider and setup valid defaults
-        _zipCodeProviderMock = webApplicationFactory.Mock<IZipCodeProvider>();
-        _zipCodeProviderMock
-            .Setup(a=> a.GetZipCodeAsync(It.IsAny<string>(),It.IsAny<string>()))
-            .ReturnsAsync(() => _getZipCodeApiResponse);
+        _zipCodeProviderMock = webApplicationFactory.Mock<IZipCodeProvider>()
+            .WithDefault(() => _getZipCodeApiResponse);
 
         // given I mock out the datetime provider and setup valid defaults
-        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>();
-        _dateTimeProviderMock
-            .Setup(a=> a.UtcNow())
-            .Returns(() => Defaults.UtcNow);
+        _dateTimeProviderMock = webApplicationFactory.Mock<IDateTimeProvider>()
+            .WithDefault(() => Defaults.UtcNow);
 
         // given I mock out the guid provider and setup valid defaults
-        _guidProviderMock = webApplicationFactory.Mock<IGuidProvider>();
-        _guidProviderMock
-            .Setup(a=> a.NewGuid())
-            .Returns(() => Defaults.OrderId);
+        _guidProviderMock = webApplicationFactory.Mock<IGuidProvider>()
+            .WithDefault(() => Defaults.OrderId);
 
         // given I have an HttpClient
         _httpClient = webApplicationFactory.CreateClient();

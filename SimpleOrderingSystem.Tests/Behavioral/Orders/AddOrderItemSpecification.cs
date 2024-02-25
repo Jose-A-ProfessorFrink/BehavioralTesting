@@ -13,10 +13,10 @@ namespace SimpleOrderingSystem.Tests.Behavioral.Orders;
 /// include mocking out all the wire dependencies and setting appropriate happy path defaults on the mocked
 /// out wire dependencies.
 /// </summary>
-public class AddOrderItemSpecification : IClassFixture<WebApplicationFactoryFixture>
+public class AddOrderItemSpecification : IDisposable
 {
     // sut
-    private readonly HttpClient _httpClient;
+    private readonly WebApplicationFactory webApplicationFactory;
 
     // mocks
     private readonly Mock<ILiteDbProvider> _liteDbProviderMock;
@@ -82,8 +82,11 @@ public class AddOrderItemSpecification : IClassFixture<WebApplicationFactoryFixt
         Quantity = 20
     };
 
-    public AddOrderItemSpecification(WebApplicationFactoryFixture webApplicationFactory)
+    public AddOrderItemSpecification()
     {
+        // given I have a web application factory
+        webApplicationFactory = WebApplicationFactory.Create();
+
         // given I mock out the lite db provider and setup appropriate defaults
         _liteDbProviderMock = webApplicationFactory.Mock<ILiteDbProvider>()
             // the extension below is one we created because we use this setup in many other spec files. 
@@ -106,9 +109,6 @@ public class AddOrderItemSpecification : IClassFixture<WebApplicationFactoryFixt
         _dateTimeProviderMock
             .Setup(a=> a.UtcNow())
             .Returns(() => Defaults.UtcNow);
-
-        // given I have an HttpClient
-        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact(DisplayName = "Add order item should return bad request when order id is invalid")]
@@ -609,7 +609,12 @@ public class AddOrderItemSpecification : IClassFixture<WebApplicationFactoryFixt
 
     public async Task<HttpResponseMessage> AddOrderItemAsync(string? orderId, TestAddOrderItemRequestViewModel request)
     {
-        return await _httpClient.PostAsJsonAsync($"Orders/{orderId}/items" , request);
+        return await webApplicationFactory.CreateClient().PostAsJsonAsync($"Orders/{orderId}/items" , request);
+    }
+
+    public void Dispose()
+    {
+        this.webApplicationFactory?.Dispose();
     }
 
     #endregion

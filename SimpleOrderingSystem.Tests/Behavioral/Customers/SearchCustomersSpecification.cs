@@ -1,5 +1,3 @@
-
-using Microsoft.Extensions.Configuration;
 using SimpleOrderingSystem.Repositories.LiteDB.ProviderModels;
 using SimpleOrderingSystem.Repositories.LiteDB.Providers;
 
@@ -48,6 +46,7 @@ public class SearchCustomersSpecification : IClassFixture<WebApplicationFactoryF
             .Setup(a=>a.SearchCustomersAsync(It.IsAny<string>()))
             .ReturnsAsync(() => _customerSearchResults);
 
+        // given I have an http client.
         _httpClient = webApplicationFactory.CreateClient();
     }
 

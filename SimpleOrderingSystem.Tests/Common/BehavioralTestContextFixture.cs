@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Memory;
-using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Net.Http.Headers;
 
 namespace SimpleOrderingSystem.Tests.Common;
 
@@ -40,6 +39,9 @@ public class BehavioralTestContextFixture<TEntryPoint> : IDisposable
         {
             // clear out the mock
             mock.Reset();
+
+            // the default value provider is NOT reset when the mock is reset so do this now
+            mock.DefaultValueProvider = new BehavioralDefaultValueProvider();
 
             return (Mock<T>)mock;
         }
