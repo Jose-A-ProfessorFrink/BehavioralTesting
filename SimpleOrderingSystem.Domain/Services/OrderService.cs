@@ -1,4 +1,3 @@
-using Jerry;
 using SimpleOrderingSystem.Domain.Models;
 using SimpleOrderingSystem.Domain.Providers;
 using SimpleOrderingSystem.Domain.Repositories;
@@ -46,7 +45,6 @@ internal class OrderService:IOrderService
         var newOrder = new Order()
         {
             Id = _guidProvider.NewGuid(),
-            Status = OrderStatus.New,
             Type = request.Type,
             CreatedDateTimeUtc = _dateTimeProvider.UtcNow(),
             ShippingAddress = request.ShippingAddress is null? default: new Address
@@ -105,14 +103,7 @@ internal class OrderService:IOrderService
             throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.OrderIdInvalid);
         }
 
-        if(order.Status != OrderStatus.New)
-        {
-            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
-                $"Cannot cancel order because the order status does not allow cancellation."); 
-        }
-
-        order.Status = OrderStatus.Cancelled;
-        order.CancelledDateTimeUtc = _dateTimeProvider.UtcNow();
+        order.Cancel(_dateTimeProvider.UtcNow());
 
         await _ordersRepository.UpdateOrderAsync(order);
 
@@ -128,20 +119,7 @@ internal class OrderService:IOrderService
             throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.OrderIdInvalid);
         }
 
-        if(order.Status != OrderStatus.New)
-        {
-            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
-                $"Cannot complete order because the order status does not allow completion."); 
-        }
-
-        if(!order.Items.Any())
-        {
-            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
-                $"Cannot complete order because the order does not contain any items!"); 
-        }
-
-        order.Status = OrderStatus.Completed;
-        order.CompletedDateTimeUtc = _dateTimeProvider.UtcNow();
+        order.Complete(_dateTimeProvider.UtcNow());
 
         await _ordersRepository.UpdateOrderAsync(order);
 
@@ -169,7 +147,7 @@ internal class OrderService:IOrderService
             throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.MovieIdInvalid);
         }
 
-        BigPapa.DoIt(order, movie, request.Quantity.ToString(), false);
+        order.AddOrderItem(movie, request.Quantity);
 
         await _ordersRepository.UpdateOrderAsync(order);
 
@@ -191,15 +169,7 @@ internal class OrderService:IOrderService
                 $"Cannot remove item to order because the order status does not allow removing items."); 
         }
 
-        var movie = order.Items.SingleOrDefault(a=>a.MovieId == request.MovieId);
-        if(movie is null)
-        {
-            throw new SimpleOrderingSystemException(SimpleOrderingSystemErrorType.InvalidRequest,
-                $"Cannot remove item from order because item is not on this order.");
-        }
-        order.Items.Remove(movie);
-        
-        BigPapa.DoIt(order, default, null, false);
+        order.DeleteOrderItem(request.MovieId);
 
         await _ordersRepository.UpdateOrderAsync(order);
 
