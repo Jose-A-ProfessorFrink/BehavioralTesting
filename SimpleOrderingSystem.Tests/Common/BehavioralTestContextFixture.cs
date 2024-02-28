@@ -38,13 +38,7 @@ public class BehavioralTestContextFixture<TEntryPoint> : IDisposable
         if (_mockDictionary.TryGetValue(typeof(T), out var mock))
         {
             // clear out the mock
-            mock.Reset();
-
-            // the default value provider is NOT reset when the mock is reset so do this now if we need to
-            if (mock.DefaultValueProvider is BehavioralDefaultValueProvider)
-            {
-                mock.DefaultValueProvider = new BehavioralDefaultValueProvider();
-            }
+            mock.ResetBehavioral();
 
             return (Mock<T>)mock;
         }
